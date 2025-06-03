@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E56766FB2DEF2BCE0086706F /* CombineCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = E56766FA2DEF2BCE0086706F /* CombineCocoa */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		E54CB6852DD838EF00ABB462 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E56766FB2DEF2BCE0086706F /* CombineCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +130,7 @@
 			);
 			name = RickAndMorty;
 			packageProductDependencies = (
+				E56766FA2DEF2BCE0086706F /* CombineCocoa */,
 			);
 			productName = RickAndMorty;
 			productReference = E54CB66E2DD838ED00ABB462 /* RickAndMorty.app */;
@@ -208,6 +214,9 @@
 			);
 			mainGroup = E54CB6652DD838ED00ABB462;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E56766F92DEF2BCE0086706F /* XCRemoteSwiftPackageReference "CombineCocoa" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E54CB66F2DD838ED00ABB462 /* Products */;
 			projectDirPath = "";
@@ -597,6 +606,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E56766F92DEF2BCE0086706F /* XCRemoteSwiftPackageReference "CombineCocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CombineCommunity/CombineCocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E56766FA2DEF2BCE0086706F /* CombineCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E56766F92DEF2BCE0086706F /* XCRemoteSwiftPackageReference "CombineCocoa" */;
+			productName = CombineCocoa;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E54CB6662DD838ED00ABB462 /* Project object */;
 }
