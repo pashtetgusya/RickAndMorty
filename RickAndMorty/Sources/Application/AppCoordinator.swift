@@ -2,24 +2,17 @@ import UIKit
 
 // MARK: - Application coodrinator
 
-/// Класс, реалищующий интерфейс координатора `UITabBarController'а` и
+/// Класс, реалищующий интерфейс координатора и
 /// являющийся главным координатором приложения.
-final class AppCoordinator: TabBarCoordinator {
+final class AppCoordinator: Coordinator {
     
     // MARK: Properties
     
-    /// Контейнер с зависимостями.
-    ///
-    /// Хранит в себе зависимости,
-    /// используемыми для конфигурации экранов.
-    private let diContainer: AppDIContainer
-    
-    var charactersCoordinator: Coordinator?
-    var locationsCoordinator: Coordinator?
-    var episodesCoordinator: Coordinator?
+    /// Контейнер для получения экранов.
+    private let diContainer: DIContainer
     
     var childCoordinators: [Coordinator] = []
-    var rootViewController: UITabBarController?
+    var rootViewController: RnMTabBarController?
     var navController: UINavigationController? { nil }
     
     var didFinish: ((Coordinator) -> Void)?
@@ -28,11 +21,11 @@ final class AppCoordinator: TabBarCoordinator {
     
     /// Создает новый экземпляр класса.
     /// - Parameter diContainer: контейнер с зависимостями.
-    init(di diContainer: AppDIContainer) {
+    init(di diContainer: DIContainer) {
         self.diContainer = diContainer
     }
     
-    // MARK: Functions
+    // MARK: Coordinator protocol implementation
     
     func start() -> UIViewController {
         let tabBarController = RnMTabBarController()
@@ -47,9 +40,7 @@ final class AppCoordinator: TabBarCoordinator {
     }
     
     func resetToRoot() -> Self {
-        charactersCoordinator?.resetToRoot(animated: false)
-        locationsCoordinator?.resetToRoot(animated: true)
-        episodesCoordinator?.resetToRoot(animated: false)
+        childCoordinators.forEach { $0.resetToRoot(animated: false) }
         rootViewController?.selectedIndex = 0
         
         return self
@@ -60,7 +51,7 @@ final class AppCoordinator: TabBarCoordinator {
 
 private extension AppCoordinator {
     
-    /// Запускает поток координатора персонажей.
+    /// Выполняет запуск потока координатора персонажей.
     func startCharactersCoordinator() -> UIViewController {
         // let coordinator: Coordinator = RnMCharactersCoordinator(di: diContainer)
         // coordinator.didFinish = { [weak self] coordinator in
@@ -69,14 +60,12 @@ private extension AppCoordinator {
         // addChild(coordinator)
         
         let viewController = UIViewController() // coordinator.start()
-        // charactersCoordinator = coordinator
-        (rootViewController as? RnMTabBarController)?
-            .setupViewControllerTabItem(for: viewController, item: .characters)
+        rootViewController?.setupViewControllerTabItem(for: viewController, item: .characters)
         
         return viewController
     }
     
-    /// Запускает поток координатора локаций.
+    /// Выполняет запуск потока координатора локаций.
     func startLocationsCoordinator() -> UIViewController {
         // let coordinator: Coordinator = RnMLocationsCoodrinator(di: diContainer)
         // coordinator.didFinish = { [weak self] coordinator in
@@ -85,14 +74,12 @@ private extension AppCoordinator {
         // addChild(coordinator)
         
         let viewController = UIViewController() // coordinator.start()
-        // locationsCoordinator = coordinator
-        (rootViewController as? RnMTabBarController)?
-            .setupViewControllerTabItem(for: viewController, item: .locations)
+        rootViewController?.setupViewControllerTabItem(for: viewController, item: .locations)
         
         return viewController
     }
     
-    /// Запускает поток координатора эпизодов.
+    /// Выполняет запуск потока координатора эпизодов.
     func startEpisodesCoordinator() -> UIViewController {
         // let coordinator: Coordinator = RnMEpisodesCoodrinator(di: diContainer)
         // coordinator.didFinish = { [weak self] coordinator in
@@ -101,9 +88,8 @@ private extension AppCoordinator {
         // addChild(coordinator)
         
         let viewController = UIViewController() // coordinator.start()
-        // locationsCoordinator = coordinator
-        (rootViewController as? RnMTabBarController)?
-            .setupViewControllerTabItem(for: viewController, item: .episodes)
+        //
+        rootViewController?.setupViewControllerTabItem(for: viewController, item: .episodes)
         
         return viewController
     }

@@ -17,10 +17,10 @@ import UIKit
     
     // MARK: Functions
     
-    /// Запускает поток координатора.
+    /// Выполняет запуск потока координатора.
     /// - Returns: корневой `UIViewController` потока.
     @discardableResult func start() -> UIViewController
-    /// Сбрасывает навигационный стек к корневому `UIViewController`.
+    /// Выполняет сброс навигационного стека к корневому `UIViewController`.
     /// - Parameter animated: флаг необходимости выполнения анимации.
     /// - Returns: себя (для цепочки вызовов).
     @discardableResult func resetToRoot(animated: Bool) -> Self
@@ -33,8 +33,6 @@ import UIKit
 // MARK: - Coordinator protocol base implementation
 
 extension Coordinator {
-    
-    // MARK: Functions
     
     func resetToRoot(animated: Bool) -> Self {
         navController?.popToRootViewController(animated: animated)

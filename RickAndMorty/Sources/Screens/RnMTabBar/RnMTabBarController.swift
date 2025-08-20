@@ -20,7 +20,7 @@ extension RnMTabBarController {
 
 extension RnMTabBarController {
     
-    /// Настраивает таб бар.
+    /// Выполняет настройку таб бара.
     private func setupTabBar() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -41,9 +41,9 @@ extension RnMTabBarController {
         tabBar.scrollEdgeAppearance = appearance
     }
     
-    /// Настраивает таб айтем вью контроллера.
+    /// Выполняет настройку таб бар айтема вью контроллера.
     /// - Parameters:
-    ///   - viewController: вью контроллер у которого настраивается таб айтем.
+    ///   - viewController: вью контроллер у которого настраивается таб бар айтем.
     ///   - item: айтем на основе которого выполняется настройка.
     func setupViewControllerTabItem(
         for viewController: UIViewController,
