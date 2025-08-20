@@ -32,29 +32,20 @@ extension AppDelegate: UIApplicationDelegate {
 
 private extension AppDelegate {
     
-    /// Создает и настраивает контейнер с зависимостями приложения.
+    /// Выполняет настройку контейнера с зависимостями приложения.
     func setupDIcontainer() {
         appDIContainer = AppDIContainer()
         
-        appDIContainer.register(NetworkMonitor.self) { _ in NWPathNetworkMonitor() }
-        appDIContainer.register(RnMCharacterHTTPClient.self) { _ in RnMCharacterURLSessionHTTPClient() }
-        appDIContainer.register(RnMEpisodeHTTPClient.self) { _ in RnMEpisodeURLSessionHTTPClient() }
-        appDIContainer.register(ImageCache.self) { _ in NSImageCache() }
-        appDIContainer.register(ImageLoader.self) { _ in URLSessionImageLoader() }
-        appDIContainer.register(ImageProvider.self) { contaiter in
-            DefaultImageProvider(
-                imageLoader: contaiter.resolve(ImageLoader.self),
-                imageCache: contaiter.resolve(ImageCache.self)
-            )
-        }
+        let appDIAssembly = AppDIAssembly()
+        appDIAssembly.assemble(container: appDIContainer)
     }
     
-    /// Создает и настраивает координатор приложения.
+    /// Выполняет настройку координатора приложения.
     func setupAppCoordinator() {
         appCoordinator = AppCoordinator(di: appDIContainer)
     }
     
-    /// Создает и настраивает главный контроллер приложения.
+    /// Выполняет настройку главного контроллера приложения.
     func setupRootViewControler() {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = appCoordinator?.start()
