@@ -58,7 +58,7 @@ final class NWPathNetworkMonitor: NetworkMonitor, @unchecked Sendable {
 
 private extension NWPathNetworkMonitor {
     
-    /// Настраивает замыкания обратного вызова, сообщающие о статусе подключения к сети.
+    /// Выполняет настройку замыкания обратного вызова, сообщающего о статусе подключения к сети.
     func setupPathUpdateHandlers() {
         self.cellularNWPathMonitor.pathUpdateHandler = { [weak self] path in
             if path.status == .satisfied {

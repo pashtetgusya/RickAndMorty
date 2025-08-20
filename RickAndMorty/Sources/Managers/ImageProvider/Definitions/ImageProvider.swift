@@ -14,8 +14,8 @@ protocol ImageProvider: Sendable {
     
     // MARK: Functions
     
-    /// Получает изображение по `URL`.
-    /// - Parameter url: `URL` изображения для загрузки.
+    /// Выполняет получение изображения по указанному`URL`-адресу.
+    /// - Parameter url: `URL`-адрес изображения для получения.
     /// - Returns: данные изображения в формате `Data`.
     func image(for url: URL) async -> Data?
 }
