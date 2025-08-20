@@ -4,7 +4,7 @@ import UIKit
 
 extension UICollectionView {
     
-    /// Регистрирует класс футера для последующего использования в коллекции.
+    /// Выполняет регистрацию футера для последующего использования в коллекции.
     /// - Parameter footer: класс футера, который необходимо зарегистрировать.
     func registerFooter(_ footer: UICollectionReusableView.Type) {
         register(
