@@ -9,7 +9,7 @@ final class RnMCharacterInfoViewController: UIViewController {
     // MARK: Properties
      
     private let contentView: RnMCharacterInfoView
-    private let dataSource: RnMCharacterInfoTableDataSource
+    private let dataSource: RnMCharacterInfoDataSource
     private let viewModel: RnMCharacterInfoViewModel
     
     private var cancellables: Set<AnyCancellable> = []
@@ -19,7 +19,7 @@ final class RnMCharacterInfoViewController: UIViewController {
     /// Создает новый экземпляр класса.
     init(viewModel: RnMCharacterInfoViewModel) {
         self.contentView = RnMCharacterInfoView()
-        self.dataSource = RnMCharacterInfoTableDataSource(for: self.contentView.tableView)
+        self.dataSource = RnMCharacterInfoDataSource(for: self.contentView.tableView)
         self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
@@ -84,17 +84,22 @@ extension RnMCharacterInfoViewController: UITableViewDelegate {
 
 private extension RnMCharacterInfoViewController {
     
-    /// Настраивает сабвью.
+    /// Выпоняет настройку `view`-компонентов.
     func setupViews() {
         contentView.tableView.delegate = self
-        
-        navigationItem.title = viewModel.characterName
     }
     
-    /// Настраивает подписки на события вью модели.
+    /// Выполняет настройку подписок на события вью модели.
     func setupViewModelBindings() {
         viewModel
+            .$characterName
+            .map { $0 }
+            .assign(to: \.title, on: navigationItem)
+            .store(in: &cancellables)
+        
+        viewModel
             .$characterInfoParameterList
+            .debounce(for: 0.3, scheduler: DispatchQueue.main)
             .sink { [weak self] parameterList in
                 self?.dataSource.update(with: parameterList)
             }

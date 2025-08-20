@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 // MARK: - Rick and Morty character cell view model
 
@@ -7,15 +8,17 @@ import Foundation
     
     // MARK: Services
     
-    private let imageProvider: ImageProvider
+    private let imageProvider: ImageProvider?
     
     // MARK: Properties
     
+    /// Флаг выполнения загрузки изображения персонажа.
+    @Published var isLoading: Bool
+    /// Данные изображения персонажа.
+    @Published var characterImageData: Data?
     /// Отображаемый в ячейке персонаж из вселенной `"Rick and Morty"`.
     let character: RnMCharacterListModel.Character
     
-    /// Замыкание, которое будет вызвано по окончании загрузки изображения персонажа.
-    private var loadCharacterImageCompletion: ((Data?) -> Void)?
     /// Задача на загрузку изображения персонажа.
     private var loadCharacterImageTask: Task<Void, Never>?
     
@@ -25,32 +28,32 @@ import Foundation
     /// - Parameter character: отображаемый персонаж.
     init(
         character: RnMCharacterListModel.Character,
-        imageProvider: ImageProvider
+        imageProvider: ImageProvider?
     ) {
-        self.character = character
         self.imageProvider = imageProvider
+        
+        self.isLoading = false
+        self.character = character
     }
     
     // MARK: Functions
     
     /// Выполняет загрузку изображения персонажа.
-    /// - Parameter completion: замыкание, которое выполнится по окончании загрузки.
-    func loadCharacterImage(with completion: ((Data?) -> Void)?) {
-        loadCharacterImageCompletion = completion
-        
+    func loadCharacterImage() {
         guard loadCharacterImageTask == nil else { return }
         defer { loadCharacterImageTask = nil }
         
         loadCharacterImageTask = Task {
-            let image = await imageProvider.image(for: character.imageURL)
-            loadCharacterImageCompletion?(image)
+            defer { isLoading = false }
+            isLoading = true
+            
+            let imageData = await imageProvider?.image(for: character.imageURL)
+            characterImageData = imageData
         }
     }
     
     /// Отменяет загрузку изображения персонажа.
     func cancelLoadCharacterImage() {
-        loadCharacterImageCompletion = nil
-        
         loadCharacterImageTask?.cancel()
         loadCharacterImageTask = nil
     }

@@ -25,7 +25,7 @@ class BaseNavigationController: UINavigationController {
 
 private extension BaseNavigationController {
     
-    /// Настраивает навигейшн бар.
+    /// Выполняет настройку навигейшн бара.
     func setupNavigationBar() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()

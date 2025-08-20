@@ -1,4 +1,5 @@
 import UIKit
+import Combine
 
 // MARK: - Rick and Morty character info table header view
 
@@ -7,7 +8,7 @@ final class RnMCharacterInfoTableHeaderView: UITableViewHeaderFooterView {
     
     // MARK: Sublayers
     
-    /// Лейер градиентного затемнения нижней границы изображения.
+    /// Слой градиентного затемнения нижней границы изображения.
     private let tintLayer: CALayer = {
         let layer = CAGradientLayer()
         layer.name = "gradientLayer"
@@ -24,7 +25,7 @@ final class RnMCharacterInfoTableHeaderView: UITableViewHeaderFooterView {
     
     /// Вью индикации загрузки изображения персонажа.
     private let imageLoadIndicatorView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .medium)
+        let view = UIActivityIndicatorView(style: .large)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.hidesWhenStopped = true
         view.tintColor = .black
@@ -45,6 +46,8 @@ final class RnMCharacterInfoTableHeaderView: UITableViewHeaderFooterView {
     // MARK: Properties
     
     private var viewModel: RnMCharacterInfoTableHeaderViewModel?
+    
+    private var cancellables: Set<AnyCancellable> = []
     
     // MARK: Initialization
     
@@ -83,6 +86,8 @@ extension RnMCharacterInfoTableHeaderView {
         viewModel?.cancelLoadCharacterImage()
         viewModel = nil
         
+        cancellables = []
+        
         imageLoadIndicatorView.stopAnimating()
         imageView.image = UIImage.charactersEmptySnapshot
     }
@@ -92,21 +97,33 @@ extension RnMCharacterInfoTableHeaderView {
 
 extension RnMCharacterInfoTableHeaderView {
     
-    /// Настраивает ячейку на основе вью модели с персонажем.
+    /// Выполняет настройку ячейки на основе вью модели с персонажем.
     /// - Parameter viewModel: вью модель ячейки.
     func setup(with viewModel: RnMCharacterInfoTableHeaderViewModel?) {
         self.viewModel = viewModel
         
         guard let viewModel else { return }
         
-        imageLoadIndicatorView.startAnimating()
-        viewModel.loadCharacterImage { [weak self] image in
-            self?.imageLoadIndicatorView.stopAnimating()
-            
-            guard let image else { return }
-            
-            self?.imageView.image = UIImage(data: image)
-        }
+        viewModel
+            .$isLoading
+            .debounce(for: 0.3, scheduler: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                switch isLoading {
+                case true: self?.imageLoadIndicatorView.startAnimating()
+                case false: self?.imageLoadIndicatorView.stopAnimating()
+                }
+            }
+            .store(in: &cancellables)
+        
+        viewModel
+            .$characterImageData
+            .dropFirst()
+            .compactMap { $0 }
+            .map { UIImage(data: $0) ?? UIImage.charactersEmptySnapshot }
+            .assign(to: \.image, on: imageView)
+            .store(in: &cancellables)
+        
+        viewModel.loadCharacterImage()
     }
 }
 
@@ -117,6 +134,7 @@ private extension RnMCharacterInfoTableHeaderView {
     /// Добавляет сабвью.
     func addSubviews() {
         addSubview(imageView)
+        addSubview(imageLoadIndicatorView)
         imageView.layer.addSublayer(tintLayer)
     }
     
@@ -128,6 +146,9 @@ private extension RnMCharacterInfoTableHeaderView {
             imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
             imageView.heightAnchor.constraint(equalToConstant: 260),
+            
+            imageLoadIndicatorView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            imageLoadIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
     }
 }

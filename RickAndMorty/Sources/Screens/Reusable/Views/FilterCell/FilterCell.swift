@@ -27,8 +27,6 @@ final class FilterCell: UITableViewCell {
         return label
     }()
     
-    // MARK: Properties
-    
     // MARK: Initialization
     
     /// Создает новый экземпляр класса.
@@ -75,10 +73,10 @@ extension FilterCell {
 
 extension FilterCell {
     
-    /// Настраивает ячейку на основе фильтра.
+    /// Выполняет настройку ячейки на основе фильтра.
     /// - Parameter filter: отображаемый фильтр.
     func setup(with filter: AnyFilter) {
-        titleLabel.text = filter.rawValue
+        titleLabel.text = filter.rawValue.capitalized
     }
 }
 
@@ -86,13 +84,13 @@ extension FilterCell {
 
 private extension FilterCell {
     
-    /// Добавляет сабвью.
+    /// Выполняет добавление `view`-компонентов.
     func addSubviews() {
         contentView.addSubview(checkBoxIconImageView)
         contentView.addSubview(titleLabel)
     }
     
-    /// Настраивает констрейнты.
+    /// Выполняет настройку констрейнтов.
     func setupConstraints() {
         NSLayoutConstraint.activate([
             checkBoxIconImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),

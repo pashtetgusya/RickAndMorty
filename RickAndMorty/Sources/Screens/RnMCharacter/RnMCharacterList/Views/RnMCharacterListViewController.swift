@@ -11,7 +11,7 @@ final class RnMCharacterListViewController: UIViewController {
     
     private let contentView: RnMCharacterListView
     private let searchController: BaseSearchController
-    private let dataSource: RnMCharacterListCollectionDataSource
+    private let dataSource: RnMCharacterListDataSource
     private let viewModel: RnMCharacterListViewModel
     
     private var cancellables: Set<AnyCancellable> = []
@@ -25,7 +25,7 @@ final class RnMCharacterListViewController: UIViewController {
     ) {
         self.contentView = RnMCharacterListView()
         self.searchController = searchController
-        self.dataSource = RnMCharacterListCollectionDataSource(
+        self.dataSource = RnMCharacterListDataSource(
             for: contentView.collectionView,
             cellProvider: { [weak viewModel] collectionView, indexPath, character in
                 let cellViewModel = viewModel?.getCharacterCellViewModel(for: character)
@@ -34,8 +34,8 @@ final class RnMCharacterListViewController: UIViewController {
                 
                 return cell
             },
-            supplementaryViewProvider: { [weak viewModel] collectionView, kind, indexPath in
-                switch kind {
+            supplementaryViewProvider: { [weak viewModel] collectionView, elementKind, indexPath in
+                switch elementKind {
                 case UICollectionView.elementKindSectionFooter:
                     let footerViewModel = viewModel?.getSpinerFoterViewModel()
                     let footerView: SpinerCollectionFooterView = collectionView.dequeueFooter(for: indexPath)
@@ -43,7 +43,7 @@ final class RnMCharacterListViewController: UIViewController {
                     
                     return footerView
                 
-                default: fatalError("collection supplementaryElement of \(kind) is not registered in collection")
+                default: fatalError("collection supplementaryElement of \(elementKind) is not registered in collection")
                 }
             }
         )
@@ -100,10 +100,7 @@ extension RnMCharacterListViewController: UICollectionViewDelegate {
             let character = dataSource.itemIdentifier(for: indexPath)
         else { return }
         
-        viewModel.presentCharacterInfoView(
-            for: character.id,
-            characterName: character.name
-        )
+        viewModel.presentCharacterInfoView(for: character.id)
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -121,10 +118,8 @@ extension RnMCharacterListViewController: UICollectionViewDelegate {
 
 private extension RnMCharacterListViewController {
     
-    /// Настраивает сабвью.
+    /// Выпоняет настройку `view`-компонентов.
     func setupViews() {
-        definesPresentationContext = true
-        
         contentView.collectionView.delegate = self
         searchController.searchResultsUpdater = self
         
@@ -135,7 +130,7 @@ private extension RnMCharacterListViewController {
         navigationItem.title = "Characters"
     }
     
-    /// Настраивает подписки на события вью.
+    /// Выполняет настройку подписок на события вью.
     func setupViewBindings() {
         contentView
             .showCharacterFilterItem
@@ -162,13 +157,12 @@ private extension RnMCharacterListViewController {
             }
     }
     
-    /// Настраивает подписки на события вью модели.
+    /// Выполняет настройку подписок на события вью модели.
     func setupViewModelBindings() {
         viewModel
-            .$isErrorLoading
+            .$isRefreshing
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
-            .map { $0 ? self.contentView.errorLoadingConfiguration : nil }
-            .assign(to: \.contentUnavailableConfiguration, on: self)
+            .assign(to: \.isRefreshing, on: contentView.collectionView)
             .store(in: &cancellables)
         
         viewModel
@@ -179,9 +173,10 @@ private extension RnMCharacterListViewController {
             .store(in: &cancellables)
         
         viewModel
-            .$isRefreshing
+            .$isErrorLoading
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
-            .assign(to: \.isRefreshing, on: contentView.collectionView)
+            .map { $0 ? self.contentView.errorLoadingConfiguration : nil }
+            .assign(to: \.contentUnavailableConfiguration, on: self)
             .store(in: &cancellables)
         
         viewModel

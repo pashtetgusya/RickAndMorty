@@ -4,39 +4,23 @@ import Combine
 // MARK: - Rick and Morty character list view model
 
 /// Вью модель экрана списка персонажей из вселенной `"Rick and Morty"`.
-@MainActor final class RnMCharacterListViewModel {
+@MainActor final class RnMCharacterListViewModel: ListViewModel {
     
     // MARK: Services
     
     private let characterHTTPClient: RnMCharacterHTTPClient
     private let imageProvider: ImageProvider
     private let networkMonitor: NetworkMonitor
-    
     private let coordinator: RnMCharacterListCoordinator
     
     // MARK: Properties
     
-    /// Флаг ошибки загрузки страницы списка персонажей.
-    @Published var isErrorLoading: Bool
-    /// Флаг ошибки загрузки "следующей" страницы списка персонажей.
-    private var isErrorNextPageLoading: Bool
-    /// Флаг выполнения начальной / повторной загрузки списка персонажей.
-    @Published var isLoading: Bool
-    /// Флаг выполнения обновления списка персонажей.
-    @Published var isRefreshing: Bool
-    /// Флаг выполнения загрузки "следующей" страницы списка персонажей.
-    @Published var isNextPageLoading: Bool
-    /// Флаг загрузки последней страницы).
-    private var isLastPageLoaded: Bool
-    
-    /// Страница с персонажами для загрузки.
-    private var characterPage: Int
     /// Строка для фильтрации загруженного списка персонажей по имени.
-    @Published private var filterCharacterName: String
+    @Published private var filterCharacterName: String = ""
     /// Строка для фильтрации загруженного списка персонажей по статусу.
-    @Published private var filterCharacterStatus: String
+    @Published private var filterCharacterStatus: String = ""
     /// Строка для фильтрации загруженного списка персонажей по гендеру.
-    @Published private var filterCharacterGender: String
+    @Published private var filterCharacterGender: String = ""
     
     /// Список персонажей с учетом фильтрации.
     var characterList: AnyPublisher<[RnMCharacterListModel.Character], Never> {
@@ -46,52 +30,30 @@ import Combine
                 var characterList = publishers.0
                 let name = publishers.1
                 
-                if !name.isEmpty { characterList = characterList.filter { $0.name.contains(name) } }
+                if !name.isEmpty {
+                    characterList = characterList.filter {
+                        $0.name.contains(name)
+                    }
+                }
                 
                 return characterList
             }
             .eraseToAnyPublisher()
     }
     /// Полный список персонажей.
-    @Published private var fullCharacterList: [RnMCharacterListModel.Character]
-    
-    private var cancellables: Set<AnyCancellable>
-    
-    /// Задача на загрузку следующей страницы списка персонажей.
-    private var loadNextCharacterListPageTask: Task<(), Never>?
-    /// Задача на повторную загрузку списка персонажей.
-    private var retryLoadCharacterListTask: Task<(), Never>?
+    @Published private var fullCharacterList: [RnMCharacterListModel.Character] = []
     
     // MARK: Initialization
     
     /// Создает новый экземпляр класса.
-    /// - Parameters:
-    ///   - diContainer: контейнер с зависимостями.
-    ///   - coordinator: координатор для навигации.
-    init(
-        di diContainer: RnMCharacterListDIContainer,
-        coordinator: RnMCharacterListCoordinator
-    ) {
-        self.characterHTTPClient = diContainer.characterHTTPClient
-        self.imageProvider = diContainer.imageProvider
-        self.networkMonitor = diContainer.networkMonitor
-        self.coordinator = coordinator
+    /// - Parameter dependencies: контейнер с зависимостями.
+    init(di dependencies: RnMCharacterListDependencies,) {
+        self.characterHTTPClient = dependencies.characterHTTPClient
+        self.imageProvider = dependencies.imageProvider
+        self.networkMonitor = dependencies.networkMonitor
+        self.coordinator = dependencies.coordinator
         
-        self.isErrorLoading = false
-        self.isErrorNextPageLoading = false
-        self.isLoading = false
-        self.isRefreshing = false
-        self.isNextPageLoading = false
-        self.isLastPageLoaded = false
-        
-        self.characterPage = 1
-        self.filterCharacterName = ""
-        self.filterCharacterStatus = ""
-        self.filterCharacterGender = ""
-        
-        self.fullCharacterList = []
-        
-        self.cancellables = []
+        super.init()
         
         self.setupBindings()
     }
@@ -124,7 +86,7 @@ extension RnMCharacterListViewModel {
 
 extension RnMCharacterListViewModel {
     
-    /// Устанавливает фильтр персонажей по имени.
+    /// Выполняет установку фильтра персонажей по имени.
     /// - Parameter name: имя для фильтрации.
     func filterCharacterList(by name: String) {
         filterCharacterName = name
@@ -135,68 +97,67 @@ extension RnMCharacterListViewModel {
 
 extension RnMCharacterListViewModel {
     
-    /// Загружает начальный список персонажей.
+    /// Выполняет начальную загрузку списка персонажей.
     func initialLoadCharacterList() {
-        Task {
-            defer { isLoading = false }
-            isLoading = true
+        Task { [weak self] in
+            defer { self?.isLoading = false }
+            self?.isLoading = true
             
-            do { fullCharacterList = try await loadCharacterList() }
-            catch { isErrorLoading = true }
+            do { self?.fullCharacterList = try await self?.loadCharacterList() ?? [] }
+            catch { self?.isErrorLoading = true }
         }
     }
     
-    /// Перезагружает список персонажей
+    /// Выполняет перезагруску списка персонажей
     /// (загружает первую страницу списка персонажей).
     func refreshCharacterList() {
-        Task {
-            defer { isRefreshing = false }
-            isRefreshing = true
-            isLastPageLoaded = false
-            characterPage = 1
+        Task { [weak self] in
+            defer { self?.isRefreshing = false }
+            self?.isRefreshing = true
+            self?.isLastPageLoaded = false
+            self?.currentListPage = 1
             
             do {
-                isErrorLoading = false
-                fullCharacterList = try await loadCharacterList()
+                self?.isErrorLoading = false
+                self?.fullCharacterList = try await self?.loadCharacterList() ?? []
             }
             catch {
-                fullCharacterList = []
-                isErrorLoading = true
+                self?.fullCharacterList = []
+                self?.isErrorLoading = true
             }
         }
     }
     
-    /// Загружает следующую страницу списка персонажей.
+    /// Выполняет загрузку следующей страницы списка персонажей.
     func loadNextCharacterListPage() {
         // Если уже есть задача на загрузку,
         // то ничего не делаем и дожидаемся ее выполнения.
         guard
             !isLastPageLoaded,
-            loadNextCharacterListPageTask == nil
+            loadNextListPageTask == nil
         else { return }
         
-        loadNextCharacterListPageTask = Task {
-            defer { loadNextCharacterListPageTask = nil }
-            defer { isNextPageLoading = false }
+        loadNextListPageTask = Task { [weak self] in
+            defer { self?.loadNextListPageTask = nil }
+            defer { self?.isNextPageLoading = false }
             
-            isNextPageLoading = true
-            characterPage += 1
+            self?.isNextPageLoading = true
+            self?.currentListPage += 1
             
-            try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 3)
             do {
-                isErrorNextPageLoading = false
-                fullCharacterList += try await loadCharacterList()
+                self?.isErrorNextPageLoading = false
+                self?.fullCharacterList += try await self?.loadCharacterList() ?? []
             }
-            catch HTTPRequestError.invalidStatusCode(404) { isLastPageLoaded = true }
-            catch { isErrorNextPageLoading = true }
+            catch HTTPRequestError.invalidStatusCode(404) { self?.isLastPageLoaded = true }
+            catch { self?.isErrorNextPageLoading = true }
         }
     }
     
-    /// Выполняет загрузку списка персонажей.
-    /// - Returns: загруженный список персонажей.
+    /// Выполняет загркузку списка персонажей.
+    /// - Returns: список персонажей.
     private func loadCharacterList() async throws -> [RnMCharacterListModel.Character] {
         let characterFilter = RnMCharacterHTTPRequestFilter(
-            page: characterPage,
+            page: currentListPage,
             status: .init(rawValue: filterCharacterStatus),
             gender: .init(rawValue: filterCharacterGender)
         )
@@ -213,47 +174,41 @@ extension RnMCharacterListViewModel {
     
     /// Выполняет повторную загрузку списка персонажей.
     func retryLoadCharacterList() {
-        guard retryLoadCharacterListTask == nil else { return }
+        guard retryLoadListTask == nil else { return }
         
-        retryLoadCharacterListTask = Task { [weak self] in
-            defer { self?.retryLoadCharacterListTask = nil }
+        retryLoadListTask = Task { [weak self] in
+            defer { self?.retryLoadListTask = nil }
+            defer { self?.isLoading = false }
             self?.isLoading = true
             
             do {
                 let characterList = try await self?.loadCharacterList()
-                self?.isLoading = false
                 self?.isErrorLoading = false
-                self?.fullCharacterList += characterList?.filter({ character in
+                self?.fullCharacterList = characterList?.filter({ character in
                     self?.fullCharacterList.contains(character) == false
                 }) ?? []
             }
-            catch {
-                self?.isLoading = false
-                self?.isErrorLoading = true
-            }
+            catch { self?.isErrorLoading = true }
         }
     }
     
     /// Выполняет повторную загрузку "следующей" страницы списка персонажей.
     func retryLoadNextCharacterListPage() {
-        guard retryLoadCharacterListTask == nil else { return }
+        guard retryLoadListTask == nil else { return }
         
-        retryLoadCharacterListTask = Task { [weak self] in
-            defer { self?.retryLoadCharacterListTask = nil }
+        retryLoadListTask = Task { [weak self] in
+            defer { self?.retryLoadListTask = nil }
+            defer { self?.isNextPageLoading = false }
             self?.isNextPageLoading = true
             
             do {
                 let characterList = try await self?.loadCharacterList()
-                self?.isNextPageLoading = false
                 self?.isErrorNextPageLoading = false
                 self?.fullCharacterList += characterList?.filter({ character in
                     self?.fullCharacterList.contains(character) == false
                 }) ?? []
             }
-            catch {
-                self?.isNextPageLoading = false
-                self?.isErrorNextPageLoading = true
-            }
+            catch { self?.isErrorNextPageLoading = true }
         }
     }
 }
@@ -262,7 +217,7 @@ extension RnMCharacterListViewModel {
 
 extension RnMCharacterListViewModel {
     
-    /// Отображает экран списка фильтров для персонажей.
+    /// Выполняет отображение экрана списка фильтров для персонажей.
     func presentCharacterFilterView() {
         let currentFilter = RnMCharacterFilterModel.CharacterFilter(
             gender: RnMCharacterFilterModel.CharacterGenderFilter(rawValue: filterCharacterGender) ?? .empty,
@@ -275,18 +230,10 @@ extension RnMCharacterListViewModel {
         }
     }
     
-    /// Отображает экран информации о пресонаже.
-    /// - Parameters:
-    ///   - characterId: идентификатор персонажа.
-    ///   - characterName: имя персонажа.
-    func presentCharacterInfoView(
-        for characterId: Int,
-        characterName: String
-    ) {
-        coordinator.presentCharacterInfoView(
-            for: characterId,
-            characterName: characterName
-        )
+    /// Выполняет отображение экрана информации о пресонаже.
+    /// - Parameter characterId: идентификатор персонажа.
+    func presentCharacterInfoView(for characterId: Int) {
+        coordinator.presentCharacterInfoView(for: characterId)
     }
 }
 
@@ -294,7 +241,7 @@ extension RnMCharacterListViewModel {
 
 private extension RnMCharacterListViewModel {
     
-    /// Настраивает подписки.
+    /// Выполняет настройку подписок на события сервисов.
     func setupBindings() {
         networkMonitor.start()
         networkMonitor

@@ -7,6 +7,8 @@ import UIKit
     
     // MARK: Properties
     
+    /// Контейнер с зависимостями.
+    var diContainer: DIContainer { get }
     /// Список дочерних координаторов.
     var childCoordinators: [Coordinator] { get set }
     /// Навигационный контроллер координатора.

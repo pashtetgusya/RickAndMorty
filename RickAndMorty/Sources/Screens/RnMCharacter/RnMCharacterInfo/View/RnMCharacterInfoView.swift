@@ -40,12 +40,12 @@ final class RnMCharacterInfoView: BaseViewControllerView {
 
 private extension RnMCharacterInfoView {
     
-    /// Добавляет сабвью.
+    /// Выполняет добавление `view`-компонентов.
     func addSubviews() {
         addSubview(tableView)
     }
     
-    /// Настраивает констрейнты.
+    /// Выполняет настройку констрейнтов.
     func setupConstraints() {
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: topAnchor),

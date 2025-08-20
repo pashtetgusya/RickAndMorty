@@ -56,10 +56,10 @@ enum RnMCharacterFilterModel {
         
         // MARK: Cases
         
-        case female = "Female"
-        case male = "Male"
-        case genderless = "Genderless"
-        case unknown = "unknown"
+        case female
+        case male
+        case genderless
+        case unknown
         case empty = ""
         
         // MARK: Properties
@@ -77,9 +77,9 @@ enum RnMCharacterFilterModel {
         
         // MARK: Cases
         
-        case alive = "Alive"
-        case dead = "Dead"
-        case unknown = "unknown"
+        case alive
+        case dead
+        case unknown
         case empty = ""
         
         // MARK: Properties

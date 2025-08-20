@@ -69,7 +69,7 @@ extension SpinerCollectionFooterView {
 
 extension SpinerCollectionFooterView {
     
-    /// Настраивает вью на основе вью модели.
+    /// Выполняет настройку на основе вью модели.
     /// - Parameter viewModel: вью модель для настройки.
     func setup(with viewModel: SpinerCollectionFooterViewModel?) {
         self.viewModel = viewModel
@@ -104,13 +104,13 @@ extension SpinerCollectionFooterView {
 
 private extension SpinerCollectionFooterView {
     
-    /// Добавляет сабвью.
+    /// Выполняет добавление `view`-компонентов.
     func addSubviews() {
         addSubview(activityIndicatorView)
         addSubview(networkUnreachableLabel)
     }
     
-    /// Настраивает констрейнты.
+    /// Выполняет настройку констрейнтов.
     func setupConstraints() {
         NSLayoutConstraint.activate([
             activityIndicatorView.leadingAnchor.constraint(equalTo: leadingAnchor),

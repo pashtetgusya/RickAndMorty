@@ -12,6 +12,8 @@ enum RnMCharacterInfoModel {
         
         // MARK: Properties
         
+        /// Имя персонажа.
+        let name: String
         /// Пол персонажа.
         let gender: String
         /// Текущий статус персонажа.
@@ -30,7 +32,7 @@ enum RnMCharacterInfoModel {
         
         // MARK: Initialization
         
-        /// Создает новый экземпляр класса.
+        /// Создает новый экземпляр структуры.
         /// - Parameters:
         ///   - characterInfoDTO: `DTO` объект с информацией о персонаже.
         ///   - episodeDTOList: список `DTO` объектов с информацией об эпиздах.
@@ -38,6 +40,7 @@ enum RnMCharacterInfoModel {
             characterInfoDTO: RnMCharacterDTO,
             episodeDTOList: [RnMEpisodeDTO]
         ) {
+            self.name = characterInfoDTO.name
             self.status = characterInfoDTO.status.rawValue
             self.gender = characterInfoDTO.gender.rawValue
             
@@ -50,16 +53,35 @@ enum RnMCharacterInfoModel {
                 $0.code + ": " + $0.name
             }
         }
+        
+        // MARK: Convert functions
+        
+        /// Выполняет преобразование структуры в список секций с параметрами персонажа для отображения.
+        /// - Returns: список секций с параметрами персонажа.
+        func toSectionList() -> [RnMCharacterInfoModel.Section] {
+            let detailsSection = RnMCharacterInfoModel.Section(type: .details, rows: [
+                RnMCharacterInfoModel.CharacterInfoParameter.status(description: status).erased(),
+                RnMCharacterInfoModel.CharacterInfoParameter.gender(description: gender).erased(),
+                RnMCharacterInfoModel.CharacterInfoParameter.originLocation(description: originLocationName).erased(),
+                RnMCharacterInfoModel.CharacterInfoParameter.lastLocation(description: lastLocationName).erased(),
+            ])
+            let episodesSection = RnMCharacterInfoModel.Section(type: .episodes, rows: episodeNamesInWhichAppeared.map {
+                RnMCharacterInfoModel.CharacterInfoParameter.episode(description: $0).erased()
+            })
+            let sectionList = [detailsSection, episodesSection]
+            
+            return sectionList
+        }
     }
     
     // MARK: Character info section
     
-    /// Структура описания секции таблицы списка фильтров для персонажей.
+    /// Структура описания секции таблицы информации о персонаже.
     struct Section: Equatable, Hashable {
         
         // MARK: Character info section type
         
-        /// Перечень позможных вариантов
+        /// Перечень возможных вариантов
         /// секций таблцы информации о персонаже.
         enum SType: Int, Equatable, Hashable {
             
@@ -76,7 +98,7 @@ enum RnMCharacterInfoModel {
         /// Тип секции.
         let type: RnMCharacterInfoModel.Section.SType
         /// Перечень ячеек секции.
-        var rows: [AnyParameter]
+        let rows: [AnyParameter]
     }
     
     // MARK: Character info parameter
@@ -99,7 +121,6 @@ enum RnMCharacterInfoModel {
         
         // MARK: Properties
         
-        /// Иконка параметра.
         var icon: Data {
             switch self {
             case .status: UIImage.characterInfoStatusIcon.pngData() ?? Data()
@@ -109,7 +130,6 @@ enum RnMCharacterInfoModel {
             case .episode: UIImage.characterInfoEpisodeIcon.pngData() ?? Data()
             }
         }
-        /// Название параметра.
         var name: String {
             switch self {
             case .status: "Status"
@@ -119,7 +139,6 @@ enum RnMCharacterInfoModel {
             case .episode: "Episode"
             }
         }
-        /// Описание параметра.
         var description: String {
             switch self {
             case .status(let description): description

@@ -10,10 +10,10 @@ struct AnyFilter: Equatable, Hashable, Sendable {
     /// Фильтр, который "стирается".
     private let filter: any Filter
     /// Замыкание, реализующее сравнение фильтров
-    /// для  соответствия протоколу `Equatable`.
+    /// для соответствия протоколу `Equatable`.
     private let equals: @Sendable (AnyFilter) -> Bool
     /// Замыкание, реализующее вычисление хэша
-    /// для  соответствия протоколу `Hashable`.
+    /// для соответствия протоколу `Hashable`.
     private let hash: @Sendable (inout Hasher) -> Void
     
     /// Строковое значение (описание) фильтра.
@@ -51,7 +51,7 @@ struct AnyFilter: Equatable, Hashable, Sendable {
     
     // MARK: Functions
     
-    /// Получает исходный тип фильтра до затирания.
+    /// Выполняет получение исходного типа фильтра до затирания.
     /// - Parameter type: тип получаемого фильтра.
     /// - Returns: фильтр.
     func nonErasedValue<T: Filter>(as type: T.Type) -> T? {

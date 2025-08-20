@@ -25,7 +25,7 @@ import Combine
     /// Текущие параметры фильтрации для персонажей.
     let currentFilter: RnMCharacterFilterModel.CharacterFilter
     /// Новые параметры фильтрации для персонажей.
-    @Published private var newFilter: RnMCharacterFilterModel.CharacterFilter
+    @Published var newFilter: RnMCharacterFilterModel.CharacterFilter
     /// Список секций с фильтрами для персонажей.
     @Published var filterList: [RnMCharacterFilterModel.Section]
     
@@ -58,7 +58,7 @@ import Combine
 
 extension RnMCharacterFilterViewModel {
     
-    /// Устанавливает новое значение фильтра для персонажей.
+    /// Выполняет установку нового значения фильтра для персонажей.
     /// - Parameter filter: новое значение фильтра.
     func setNewFilter(_ filter: AnyFilter) {
         if let genderFilter = filter.nonErasedValue(
@@ -73,7 +73,7 @@ extension RnMCharacterFilterViewModel {
         }
     }
     
-    /// Применяет фильтр для персонажей.
+    /// Выполняет применение фильтра для персонажей.
     func applyFilter() {
         didFinishCompletion(newFilter)
     }

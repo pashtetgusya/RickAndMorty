@@ -1,9 +1,9 @@
 import UIKit
 
-// MARK: - Rick and Morty character list collection data source
+// MARK: - Rick and Morty character list data source
 
 /// Источник данных коллекции отображения списка персонажей из вселенной `"Rick and Morty"`.
-final class RnMCharacterListCollectionDataSource: UICollectionViewDiffableDataSource<Int, RnMCharacterListModel.Character> {
+final class RnMCharacterListDataSource: UICollectionViewDiffableDataSource<Int, RnMCharacterListModel.Character> {
     
     // MARK: Typealiases
     
@@ -12,26 +12,30 @@ final class RnMCharacterListCollectionDataSource: UICollectionViewDiffableDataSo
     /// Замыкание для создания и настройки хедеров / футеров коллекции.
     typealias SupplementaryViewProvider = UICollectionViewDiffableDataSource<Int, String>.SupplementaryViewProvider
     
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Int, RnMCharacterListModel.Character>
+    
     // MARK: Properties
     
     /// Флаг первого отображения данных в коллекции.
     private var isFirstUpdate: Bool = true 
     
-    /// Обработчик создания ячеек по умолчанию.
+    /// Обработчик создания ячеек коллекции по умолчанию.
     private static let defaultCellProvider: CellProvider = { collectionView, indexPath, character in
+        let viewModel = RnMCharacterCellViewModel(character: character, imageProvider: nil)
         let cell: RnMCharacterCell = collectionView.dequeue(for: indexPath)
+        cell.setup(with: viewModel)
         
         return cell
     }
-    /// Обработчик создани хедеров / футеров по умолчанию.
-    private static let defaultSupplementaryViewProvider: SupplementaryViewProvider = { collectionView, kind, indexPath in
-        switch kind {
+    /// Обработчик создани хедеров / футеров коллекции по умолчанию.
+    private static let defaultSupplementaryViewProvider: SupplementaryViewProvider = { collectionView, elementKind, indexPath in
+        switch elementKind {
         case UICollectionView.elementKindSectionFooter:
             let footerView: SpinerCollectionFooterView = collectionView.dequeueFooter(for: indexPath)
             
             return footerView
         
-        default: fatalError("collection supplementaryElement of \(kind) is not registered in collection")
+        default: fatalError("collection supplementaryElement of \(elementKind) is not registered in collection")
         }
     }
     
@@ -40,14 +44,14 @@ final class RnMCharacterListCollectionDataSource: UICollectionViewDiffableDataSo
     /// Создает новый экземпляр класса.
     /// - Parameters:
     ///   - collectionView: коллекция отображения списка персонажей.
-    ///   - cellProvider: обработчик создания ячеек
-    ///   (по умолчанию `RnMCharacterListDataSource.defaultCellProvider`).
-    ///   - supplementaryViewProvider: обработчик создания хедеров / футеров
-    ///   (по умолчанию `RnMCharacterListCollectionDataSource.defaultSupplementaryViewProvider`).
+    ///   - cellProvider: обработчик создания ячеек коллекции
+    ///   (по умолчанию используется `RnMCharacterListDataSource.defaultCellProvider`).
+    ///   - supplementaryViewProvider: обработчик создания хедеров / футеров коллекции
+    ///   (по умолчанию используется `RnMCharacterListDataSource.defaultSupplementaryViewProvider`).
     init(
         for collectionView: UICollectionView,
-        cellProvider: @escaping CellProvider = RnMCharacterListCollectionDataSource.defaultCellProvider,
-        supplementaryViewProvider: @escaping SupplementaryViewProvider = RnMCharacterListCollectionDataSource.defaultSupplementaryViewProvider
+        cellProvider: @escaping CellProvider = RnMCharacterListDataSource.defaultCellProvider,
+        supplementaryViewProvider: @escaping SupplementaryViewProvider = RnMCharacterListDataSource.defaultSupplementaryViewProvider
     ) {
         super.init(collectionView: collectionView, cellProvider: cellProvider)
         
@@ -57,7 +61,7 @@ final class RnMCharacterListCollectionDataSource: UICollectionViewDiffableDataSo
 
 // MARK: - Data source update functions
 
-extension RnMCharacterListCollectionDataSource {
+extension RnMCharacterListDataSource {
     
     /// Выполняет обновление данных в коллекции.
     /// - Parameters:
@@ -67,7 +71,7 @@ extension RnMCharacterListCollectionDataSource {
         with characters: [RnMCharacterListModel.Character],
         animated: Bool = true
     ) {
-        var snapshot = NSDiffableDataSourceSnapshot<Int, RnMCharacterListModel.Character>()
+        var snapshot = Snapshot()
         if !characters.isEmpty {
             snapshot.appendSections([0])
             snapshot.appendItems(characters)

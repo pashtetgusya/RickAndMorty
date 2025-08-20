@@ -24,7 +24,7 @@ class BaseSearchController: UISearchController {
 
 private extension BaseSearchController {
     
-    /// Настраивает серч бар.
+    /// Выполняет настройку серч бара.
     func setupSearchBar() {
         obscuresBackgroundDuringPresentation = false
         searchBar.enablesReturnKeyAutomatically = false

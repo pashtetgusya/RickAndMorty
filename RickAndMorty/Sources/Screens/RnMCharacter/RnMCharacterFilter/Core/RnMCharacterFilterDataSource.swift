@@ -1,23 +1,20 @@
 import UIKit
 
-// MARK: - Rick and Morty character info table data source
+// MARK: - Rick and Morty character filter data source
 
-/// Источник данных таблицы отображения информации о персонаже из вселенной `"Rick and Morty"`.
-final class RnMCharacterInfoTableDataSource: UITableViewDiffableDataSource<RnMCharacterInfoModel.Section.SType, AnyParameter> {
+/// Источник данных таблицы отображения списка фильтров для персонажей из вселенной `"Rick and Morty"`.
+final class RnMCharacterFilterDataSource: UITableViewDiffableDataSource<RnMCharacterFilterModel.Section.SType, AnyFilter> {
     
     // MARK: Typealiases
     
     /// Замыкание для создания и настройки ячеек таблицы.
-    typealias CellProvider = (UITableView, IndexPath, AnyParameter) -> UITableViewCell?
+    typealias CellProvider = (UITableView, IndexPath, AnyFilter) -> UITableViewCell?
     
     // MARK: Properties
     
-    /// Флаг первого отображения данных в таблице.
-    private var isFirstUpdate: Bool = true
-    
     /// Обработчик создания ячеек по умолчанию.
     private static let defaultCellProvider: CellProvider = { tableView, indexPath, filter in
-        let cell: ParameterCell = tableView.dequeue(for: indexPath)
+        let cell: FilterCell = tableView.dequeue(for: indexPath)
         cell.setup(with: filter)
         
         return cell
@@ -27,16 +24,14 @@ final class RnMCharacterInfoTableDataSource: UITableViewDiffableDataSource<RnMCh
     
     /// Создает новый экземпляр класса.
     /// - Parameters:
-    ///   - tableView: таблица отображения информации о персонаже.
+    ///   - tableView: таблица отображения списка фильтров для персонажей.
     ///   - cellProvider: обработчик создания ячеек
-    ///   (по умолчанию `RnMCharacterInfoTableDataSource.defaultCellProvider`).
+    ///   (по умолчанию `RnMCharacterFilterDataSource.defaultCellProvider`).
     init(
         for tableView: UITableView,
-        cellProvider: @escaping CellProvider = RnMCharacterInfoTableDataSource.defaultCellProvider
+        cellProvider: @escaping CellProvider = RnMCharacterFilterDataSource.defaultCellProvider
     ) {
         super.init(tableView: tableView, cellProvider: cellProvider)
-        
-        self.defaultRowAnimation = .fade
     }
     
     // MARK: UI table view data source functions
@@ -46,8 +41,8 @@ final class RnMCharacterInfoTableDataSource: UITableViewDiffableDataSource<RnMCh
         titleForHeaderInSection section: Int
     ) -> String? {
         switch sectionIdentifier(for: section) {
-        case .details: "Details"
-        case .episodes: "Episodes"
+        case .gender: "Gender"
+        case .status: "Status"
         
         default: nil
         }
@@ -56,23 +51,22 @@ final class RnMCharacterInfoTableDataSource: UITableViewDiffableDataSource<RnMCh
 
 // MARK: - Data source update functions
 
-extension RnMCharacterInfoTableDataSource {
+extension RnMCharacterFilterDataSource {
     
     /// Выполняет обновление данных в таблице.
     /// - Parameters:
     ///   - sections: новый список секций для отображения.
     ///   - animated: флаг анимированного обновления (по умолчанию `true`).
     func update(
-        with sections: [RnMCharacterInfoModel.Section],
+        with sections: [RnMCharacterFilterModel.Section],
         animated: Bool = true
     ) {
-        var snapshot = NSDiffableDataSourceSnapshot<RnMCharacterInfoModel.Section.SType, AnyParameter>()
+        var snapshot = NSDiffableDataSourceSnapshot<RnMCharacterFilterModel.Section.SType, AnyFilter>()
         sections.forEach {
             snapshot.appendSections([$0.type])
             snapshot.appendItems($0.rows, toSection: $0.type)
         }
         
-        apply(snapshot, animatingDifferences: animated && !isFirstUpdate)
-        if !isFirstUpdate { isFirstUpdate = false }
+        apply(snapshot, animatingDifferences: animated)
     }
 }

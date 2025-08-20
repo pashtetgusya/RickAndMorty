@@ -10,7 +10,7 @@ final class RnMCharacterFilterViewController: UIViewController {
     // MARK: Properties
     
     private let contentView: RnMCharacterFilterView
-    private let dataSource: RnMCharacterFilterTableDataSource
+    private let dataSource: RnMCharacterFilterDataSource
     private let viewModel: RnMCharacterFilterViewModel
     
     private var cancellables: Set<AnyCancellable> = []
@@ -20,7 +20,7 @@ final class RnMCharacterFilterViewController: UIViewController {
     /// Создает новый экземпляр класса.
     init(viewModel: RnMCharacterFilterViewModel) {
         self.contentView = RnMCharacterFilterView()
-        self.dataSource = RnMCharacterFilterTableDataSource(for: contentView.tableView)
+        self.dataSource = RnMCharacterFilterDataSource(for: contentView.tableView)
         self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
@@ -97,7 +97,7 @@ extension RnMCharacterFilterViewController: UITableViewDelegate {
 
 private extension RnMCharacterFilterViewController {
     
-    /// Настраивает сабвью.
+    /// Выпоняет настройку `view`-компонентов.
     func setupViews() {
         contentView.tableView.delegate = self
         
@@ -107,7 +107,7 @@ private extension RnMCharacterFilterViewController {
         navigationItem.title = "Filter"
     }
     
-    /// Настраивает подписки на события вью.
+    /// Выполняет настройку подписок на события вью.
     func setupViewBindings() {
         contentView
             .applyFilterItem
@@ -127,7 +127,7 @@ private extension RnMCharacterFilterViewController {
             .store(in: &cancellables)
     }
     
-    /// Настраивает подписки на события вью модели.
+    /// Выполняет настройку подписок на события вью модели.
     func setupViewModelBindings() {
         viewModel
             .hasChangesPublisher

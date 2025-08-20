@@ -1,4 +1,5 @@
 import UIKit
+import Combine
 
 // MARK: - Rick and Morty character cell
 
@@ -55,7 +56,29 @@ final class RnMCharacterCell: UICollectionViewCell {
     
     // MARK: Properties
     
+    override var isHighlighted: Bool {
+        didSet { isShrinked = isHighlighted }
+    }
+    override var isSelected: Bool {
+        didSet { isShrinked = isSelected }
+    }
+    /// Флаг уменьшения ячейки.
+    private var isShrinked: Bool = false {
+        didSet {
+            UIView.animate(withDuration: 0.1) {
+                switch self.isShrinked {
+                case true: self.transform = CGAffineTransform(scaleX: self.shrinkScale, y: self.shrinkScale)
+                case false: self.transform = .identity
+                }
+            }
+        }
+    }
+    /// Коэффициент уменьшения ячейки.
+    private let shrinkScale: CGFloat = 0.90
+    
     private var viewModel: RnMCharacterCellViewModel?
+    
+    private var cancellables: Set<AnyCancellable> = []
     
     // MARK: Initialization
     
@@ -83,6 +106,8 @@ extension RnMCharacterCell {
         viewModel?.cancelLoadCharacterImage()
         viewModel = nil
         
+        cancellables = []
+        
         imageLoadIndicatorView.stopAnimating()
         imageView.image = UIImage.charactersEmptySnapshot
         nameLabel.text = nil
@@ -94,26 +119,36 @@ extension RnMCharacterCell {
 
 extension RnMCharacterCell {
     
-    /// Настраивает ячейку на основе вью модели с персонажем.
+    /// Выполняет настройку ячейки на основе вью модели с персонажем.
     /// - Parameter viewModel: вью модель ячейки.
     func setup(with viewModel: RnMCharacterCellViewModel?) {
         self.viewModel = viewModel
         
         guard let viewModel else { return }
         
-        imageLoadIndicatorView.startAnimating()
-        viewModel.loadCharacterImage { [weak self] image in
-            self?.imageLoadIndicatorView.stopAnimating()
-            
-            guard let image else { return }
-            
-            self?.imageView.image = UIImage(data: image)
-        }
-        
         let info = viewModel.character.species + ", " +
                    viewModel.character.status.lowercased()
         nameLabel.text = viewModel.character.name
         infoLabel.text = info
+        
+        viewModel
+            .$isLoading
+            .sink { [weak self] isLoading in
+                switch isLoading {
+                case true: self?.imageLoadIndicatorView.startAnimating()
+                case false: self?.imageLoadIndicatorView.stopAnimating()
+                }
+            }
+            .store(in: &cancellables)
+        
+        viewModel
+            .$characterImageData
+            .compactMap { $0 }
+            .map { UIImage(data: $0) ?? UIImage.charactersEmptySnapshot }
+            .assign(to: \.image, on: imageView)
+            .store(in: &cancellables)
+        
+        viewModel.loadCharacterImage()
     }
 }
 
@@ -121,7 +156,7 @@ extension RnMCharacterCell {
 
 private extension RnMCharacterCell {
     
-    /// Добавляет сабвью.
+    /// Выполняет добавление `view`-компонентов.
     func addSubviews() {
         contentView.addSubview(imageView)
         contentView.addSubview(nameLabel)
@@ -130,7 +165,7 @@ private extension RnMCharacterCell {
         imageView.addSubview(imageLoadIndicatorView)
     }
     
-    /// Настраивает констрейнты.
+    /// Выполняет настройку констрейнтов.
     func setupConstraints() {
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),

@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 // MARK: - Rick and Morty character info table header view model
 
@@ -11,11 +12,13 @@ import Foundation
     
     // MARK: Properties
     
+    /// Флаг выполнения загрузки изображения персонажа.
+    @Published var isLoading: Bool = false
+    /// Данные изображения персонажа.
+    @Published var characterImageData: Data = Data()
     /// Ссылка на загрузку изображения персонажа.
     private let imageURL: URL
     
-    /// Замыкание, которое будет вызвано по окончании загрузки изображения персонажа.
-    private var loadCharacterImageCompletion: ((Data?) -> Void)?
     /// Задача на загрузку изображения персонажа.
     private var loadCharacterImageTask: Task<Void, Never>?
     
@@ -36,23 +39,21 @@ import Foundation
     // MARK: Functions
     
     /// Выполняет загрузку изображения персонажа.
-    /// - Parameter completion: замыкание, которое выполнится по окончании загрузки.
-    func loadCharacterImage(with completion: ((Data?) -> Void)?) {
-        loadCharacterImageCompletion = completion
-        
+    func loadCharacterImage() {
         guard loadCharacterImageTask == nil else { return }
         defer { loadCharacterImageTask = nil }
         
         loadCharacterImageTask = Task {
-            let image = await imageProvider.image(for: imageURL)
-            loadCharacterImageCompletion?(image)
+            defer { isLoading = false }
+            isLoading = true
+            
+            let imageData = await imageProvider.image(for: imageURL)
+            characterImageData = imageData ?? Data()
         }
     }
     
     /// Отменяет загрузку изображения персонажа.
     func cancelLoadCharacterImage() {
-        loadCharacterImageCompletion = nil
-        
         loadCharacterImageTask?.cancel()
         loadCharacterImageTask = nil
     }

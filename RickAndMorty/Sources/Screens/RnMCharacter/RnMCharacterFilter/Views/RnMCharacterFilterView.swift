@@ -7,11 +7,11 @@ final class RnMCharacterFilterView: BaseViewControllerView {
     
     // MARK: Subviews
     
-    /// Айтем приминения фильтра.
+    /// Кнопка приминения фильтра.
     let applyFilterItem: UIBarButtonItem = {
         UIBarButtonItem(title: "Apply")
     }()
-    /// Айтмем отмены.
+    /// Кнопка отмены изменений.
     let cancelItem: UIBarButtonItem = {
         UIBarButtonItem(title: "Cancel")
     }()
@@ -47,12 +47,12 @@ final class RnMCharacterFilterView: BaseViewControllerView {
 
 private extension RnMCharacterFilterView {
     
-    /// Добавляет сабвью.
+    /// Выполняет добавление `view`-компонентов.
     func addSubviews() {
         addSubview(tableView)
     }
     
-    /// Настраивает констрейнты.
+    /// Выполняет настройку констрейнтов.
     func setupConstraints() {
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: topAnchor),

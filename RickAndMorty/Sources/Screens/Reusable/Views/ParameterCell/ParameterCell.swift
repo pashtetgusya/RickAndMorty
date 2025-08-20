@@ -84,12 +84,12 @@ extension ParameterCell {
 
 extension ParameterCell {
     
-    /// Настраивает ячейку на основе параметра.
+    /// Выполняет настройку ячейки на основе параметра.
     /// - Parameter parameter: отображаемый параметр.
     func setup(with parameter: AnyParameter) {
         iconImageView.image = UIImage(data: parameter.icon)?.withTintColor(UIColor.applicationTint)
-        nameLabel.text = parameter.name
-        valueLabel.text = parameter.description
+        nameLabel.text = parameter.name.capitalized
+        valueLabel.text = parameter.description.capitalized
     }
 }
 
@@ -97,13 +97,13 @@ extension ParameterCell {
 
 private extension ParameterCell {
     
-    /// Добавляет сабвью.
+    /// Выполняет добавление `view`-компонентов.
     func addSubviews() {
         contentView.addSubview(iconImageView)
         contentView.addSubview(labelsStackView)
     }
     
-    /// Настраивает констрейнты.
+    /// Выполняет настройку констрейнтов.
     func setupConstraints() {
         NSLayoutConstraint.activate([
             iconImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),

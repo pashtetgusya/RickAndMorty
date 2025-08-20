@@ -10,7 +10,7 @@ struct AnyParameter: Equatable, Hashable, Sendable {
     /// Параметр, который "стирается".
     private let parameter: any Parameter
     /// Замыкание, реализующее сравнение параметров
-    /// для  соответствия протоколу `Equatable`.
+    /// для соответствия протоколу `Equatable`.
     private let equals: @Sendable (AnyParameter) -> Bool
     /// Замыкание, реализующее вычисление хэша
     /// для соответствия протоколу `Hashable`.
@@ -55,7 +55,7 @@ struct AnyParameter: Equatable, Hashable, Sendable {
     
     // MARK: Functions
     
-    /// Получает исходный тип параметра до затирания.
+    /// Выполняет получение исходного тип параметра до затирания.
     /// - Parameter type: тип получаемого параметра.
     /// - Returns: фильтр.
     func nonErasedValue<T: Parameter>(as type: T.Type) -> T? {

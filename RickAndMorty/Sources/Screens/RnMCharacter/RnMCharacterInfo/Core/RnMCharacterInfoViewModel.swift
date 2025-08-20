@@ -16,64 +16,37 @@ import Combine
     // MARK: Properties
     
     /// Флаг выполнения загрузки информации о персонаже.
-    @Published var isLoading: Bool
-    /// Флаг ошибки загрузки информации об персонаже.
-    @Published var isErrorLoading: Bool
+    @Published var isLoading: Bool = false
+    /// Флаг ошибки загрузки информации о персонаже.
+    @Published var isErrorLoading: Bool = false
     
     /// Идентификатор персонажа.
     private let characterId: Int
     /// Имя персонажа.
-    let characterName: String
-    
-    /// Информация о просматриваемом персонаже.
-    @Published private var characterInfo: RnMCharacterInfoModel.CharacterInfo?
+    @Published var characterName: String = ""
+    /// Ссылка на изображение персонажа.
+    private var characterImageURL: URL? = nil
+    /// Список секций с параметрами информации о персонаже.
     @Published var characterInfoParameterList: [RnMCharacterInfoModel.Section] = []
-    /// Паблишер списка секций с параметрами информации о персонаже.
-    var characterInfoParameterListPublisher: AnyPublisher<[RnMCharacterInfoModel.Section], Never> {
-        $characterInfo
-            .compactMap { $0 }
-            .map {
-                [
-                    RnMCharacterInfoModel.Section(type: .details, rows: [
-                        RnMCharacterInfoModel.CharacterInfoParameter.status(description: $0.status).erased(),
-                        RnMCharacterInfoModel.CharacterInfoParameter.gender(description: $0.gender).erased(),
-                        RnMCharacterInfoModel.CharacterInfoParameter.originLocation(description: $0.originLocationName).erased(),
-                        RnMCharacterInfoModel.CharacterInfoParameter.lastLocation(description: $0.lastLocationName).erased(),
-                    ]),
-                    RnMCharacterInfoModel.Section(type: .episodes, rows: $0.episodeNamesInWhichAppeared.map {
-                        RnMCharacterInfoModel.CharacterInfoParameter.episode(description: $0).erased()
-                    })
-                ]
-            }
-            .eraseToAnyPublisher()
-    }
     
-    private var cancellables: Set<AnyCancellable>
+    private var cancellables: Set<AnyCancellable> = []
     
     // MARK: Initialization
     
     /// Создает новый экземпляр класса.
     /// - Parameters:
     ///   - characterId: идентификатор персонажа.
-    ///   - characterName: имя персонажа.
-    ///   - diContainer: контейнер с зависимостями.
+    ///   - dependencies: контейнер с зависимостями.
     init(
         characterId: Int,
-        characterName: String,
-        di diContainer: RnMCharacterInfoDIContainer
+        di dependencies: RnMCharacterInfoDependencies
     ) {
+        self.characterHTTPClient = dependencies.characterHTTPClient
+        self.episodeHTTPClient = dependencies.episodeHTTPClient
+        self.imageProvider = dependencies.imageProvider
+        self.networkMonitor = dependencies.networkMonitor
+        
         self.characterId = characterId
-        self.characterName = characterName
-        
-        self.characterHTTPClient = diContainer.characterHTTPClient
-        self.episodeHTTPClient = diContainer.episodeHTTPClient
-        self.imageProvider = diContainer.imageProvider
-        self.networkMonitor = diContainer.networkMonitor
-        
-        self.isLoading = false
-        self.isErrorLoading = false
-        
-        self.cancellables = []
         
         self.setupBindings()
     }
@@ -86,10 +59,10 @@ extension RnMCharacterInfoViewModel {
     /// Создает вью модель для хедера с информацией о персонаже.
     /// - Returns: вью модель хедера.
     func getCharacterInfoTableHeaderViewModel() -> RnMCharacterInfoTableHeaderViewModel? {
-        guard let characterInfo else { return nil }
+        guard let characterImageURL else { return nil }
         
         let viewModel = RnMCharacterInfoTableHeaderViewModel(
-            imageURL: characterInfo.imageURL,
+            imageURL: characterImageURL,
             imageProvider: imageProvider
         )
         
@@ -101,48 +74,34 @@ extension RnMCharacterInfoViewModel {
 
 extension RnMCharacterInfoViewModel {
     
-    /// Загружает информацию о персонаже.
+    /// Выполняет начальную загрузку информации о персонаже.
     func initialLoadCharacterInfo() {
         Task { [weak self] in
             defer { self?.isLoading = false }
             self?.isLoading = true
             
-            let characterInfo = await self?.loadCharacterInfo()
-            self?.characterInfo = characterInfo
-            self?.characterInfoParameterList = characterInfo
-                .map {
-                    [
-                        RnMCharacterInfoModel.Section(type: .details, rows: [
-                            RnMCharacterInfoModel.CharacterInfoParameter.status(description: $0.status).erased(),
-                            RnMCharacterInfoModel.CharacterInfoParameter.gender(description: $0.gender).erased(),
-                            RnMCharacterInfoModel.CharacterInfoParameter.originLocation(description: $0.originLocationName).erased(),
-                            RnMCharacterInfoModel.CharacterInfoParameter.lastLocation(description: $0.lastLocationName).erased(),
-                        ]),
-                        RnMCharacterInfoModel.Section(type: .episodes, rows: $0.episodeNamesInWhichAppeared.map {
-                            RnMCharacterInfoModel.CharacterInfoParameter.episode(description: $0).erased()
-                        })
-                    ]
-                } ?? []
+            do {
+                let characterInfo = try await self?.loadCharacterInfo()
+                self?.characterName = characterInfo?.name ?? ""
+                self?.characterImageURL = characterInfo?.imageURL
+                self?.characterInfoParameterList = characterInfo?.toSectionList() ?? []
+                self?.isErrorLoading = false
+            }
+            catch { self?.isErrorLoading = true }
         }
     }
     
-    /// Загружает информацию о персонаже.
-    private func loadCharacterInfo() async -> RnMCharacterInfoModel.CharacterInfo? {
-        do {
-            let characterInfoDTO = try await characterHTTPClient.getCharacter(with: characterId)
-            let episodeIdList = characterInfoDTO.episodesInWhichAppeared.map { $0.id }
-            let episodeDTOList = try await episodeHTTPClient.getEpisodes(with: episodeIdList)
-            let characterInfo = RnMCharacterInfoModel.CharacterInfo(
-                characterInfoDTO: characterInfoDTO,
-                episodeDTOList: episodeDTOList
-            )
-            isErrorLoading = false
-            
-            return characterInfo
-        }
-        catch { isErrorLoading = true }
+    /// Выполняет загрузку информации о персонаже.
+    private func loadCharacterInfo() async throws -> RnMCharacterInfoModel.CharacterInfo {
+        let characterInfoDTO = try await characterHTTPClient.getCharacter(with: characterId)
+        let episodeIdList = characterInfoDTO.episodesInWhichAppeared.map { $0.id }
+        let episodeDTOList = try await episodeHTTPClient.getEpisodes(with: episodeIdList)
+        let characterInfo = RnMCharacterInfoModel.CharacterInfo(
+            characterInfoDTO: characterInfoDTO,
+            episodeDTOList: episodeDTOList
+        )
         
-        return nil
+        return characterInfo
     }
 }
 
@@ -152,7 +111,18 @@ extension RnMCharacterInfoViewModel {
     
     /// Выполняет повторную загрузку информации о персонаже.
     func retryLoadCharacterInfo() {
-        initialLoadCharacterInfo()
+        Task { [weak self] in
+            defer { self?.isLoading = false }
+            self?.isLoading = true
+            
+            do {
+                let characterInfo = try await self?.loadCharacterInfo()
+                self?.characterName = characterInfo?.name ?? ""
+                self?.characterInfoParameterList = characterInfo?.toSectionList() ?? []
+                self?.isErrorLoading = false
+            }
+            catch { self?.isErrorLoading = true }
+        }
     }
 }
 
@@ -160,7 +130,7 @@ extension RnMCharacterInfoViewModel {
 
 private extension RnMCharacterInfoViewModel {
     
-    /// Настраивает подписки.
+    /// Выполняет настройку подписок на события сервисов.
     func setupBindings() {
         networkMonitor.start()
         networkMonitor

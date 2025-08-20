@@ -7,20 +7,12 @@ final class RnMCharacterListView: BaseViewControllerView {
     
     // MARK: Subviews
     
-    /// Айтем отображения списка фильтров для персонажей.
+    /// Кнопка отображения списка фильтров для персонажей.
     let showCharacterFilterItem: UIBarButtonItem = {
         let item = UIBarButtonItem(title: "Filter")
         item.tintColor = UIColor.applicationTint
         
         return item
-    }()
-    /// Вью индикатора отображеня загрузки.
-    let activityIndicatorView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .large)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.hidesWhenStopped = true
-        
-        return view
     }()
     /// Коллекция отображения списка персонажей.
     let collectionView: UICollectionView = {
@@ -39,6 +31,7 @@ final class RnMCharacterListView: BaseViewControllerView {
     
     // MARK: Properties
     
+    /// Конфигурация отображения процесса загрузки контента.
     let loadingConfiguration: UIContentUnavailableConfiguration = {
         var configuration = UIContentUnavailableConfiguration.loading()
         configuration.text = "Please wait..."
@@ -46,6 +39,7 @@ final class RnMCharacterListView: BaseViewControllerView {
         
         return configuration
     }()
+    /// Конфигурация отображения ошибки загрузки контента.
     var errorLoadingConfiguration: UIContentUnavailableConfiguration = {
         var buttonConfiguration = UIButton.Configuration.borderless()
         buttonConfiguration.title = "Retry"
@@ -81,18 +75,14 @@ final class RnMCharacterListView: BaseViewControllerView {
 
 private extension RnMCharacterListView {
     
-    /// Добавляет сабвью.
+    /// Выполняет добавление `view`-компонентов.
     func addSubviews() {
         addSubview(collectionView)
-        addSubview(activityIndicatorView)
     }
     
-    /// Настраивает констрейнты.
+    /// Выполняет настройку констрейнтов.
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            activityIndicatorView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            activityIndicatorView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            
             collectionView.topAnchor.constraint(equalTo: topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),

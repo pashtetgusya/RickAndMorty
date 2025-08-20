@@ -15,7 +15,7 @@ protocol Filter: Equatable, Hashable, Sendable {
 
 extension Filter {
     
-    /// Создает тип-стиратель для текущего фильтра.
+    /// Выполняет стирание типа для текущего фильтра.
     func erased() -> AnyFilter {
         AnyFilter(self)
     }

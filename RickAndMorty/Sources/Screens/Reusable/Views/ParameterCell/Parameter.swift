@@ -19,7 +19,7 @@ protocol Parameter: Equatable, Hashable, Sendable {
 
 extension Parameter {
     
-    /// Создает тип-стиратель для текущего параметра.
+    /// Выполняет стирание типа для текущего параметра.
     func erased() -> AnyParameter {
         AnyParameter(self)
     }

@@ -8,9 +8,7 @@ final class AppCoordinator: Coordinator {
     
     // MARK: Properties
     
-    /// Контейнер для получения экранов.
-    private let diContainer: DIContainer
-    
+    let diContainer: DIContainer
     var childCoordinators: [Coordinator] = []
     var rootViewController: RnMTabBarController?
     var navController: UINavigationController? { nil }
@@ -53,13 +51,13 @@ private extension AppCoordinator {
     
     /// Выполняет запуск потока координатора персонажей.
     func startCharactersCoordinator() -> UIViewController {
-        // let coordinator: Coordinator = RnMCharactersCoordinator(di: diContainer)
-        // coordinator.didFinish = { [weak self] coordinator in
-        //     self?.removeChild(coordinator)
-        // }
-        // addChild(coordinator)
+        let coordinator = diContainer.resolve(RnMCharactersCoordinator.self)
+        coordinator.didFinish = { [weak self] coordinator in
+            self?.removeChild(coordinator)
+        }
+        addChild(coordinator)
         
-        let viewController = UIViewController() // coordinator.start()
+        let viewController = coordinator.start()
         rootViewController?.setupViewControllerTabItem(for: viewController, item: .characters)
         
         return viewController

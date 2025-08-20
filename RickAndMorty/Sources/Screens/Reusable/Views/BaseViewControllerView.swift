@@ -23,7 +23,7 @@ class BaseViewControllerView: UIView {
 
 private extension BaseViewControllerView {
     
-    /// Настраивает вью.
+    /// Выполняет настройку `view`-компонентов.
     func setup() {
         backgroundColor = UIColor.viewDefaultBackground
     }
