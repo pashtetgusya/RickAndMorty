@@ -4,7 +4,7 @@ import Data
 // MARK: - Character info
 
 /// Структура, описывающая модель подробной информации о персонаже.
-public struct CharacterInfo {
+public struct CharacterInfo: Sendable {
     
     // MARK: Properties
     

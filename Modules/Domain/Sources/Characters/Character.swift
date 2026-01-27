@@ -7,7 +7,7 @@ import Data
 ///
 /// Содержит основную информацию о персонаже
 /// (идентификатор, имя, статус и ссылку на изображение).
-public struct Character: Equatable, Hashable {
+public struct Character: Equatable, Hashable, Sendable {
     
     // MARK: Properties
     

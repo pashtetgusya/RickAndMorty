@@ -4,7 +4,7 @@ import Resources
 // MARK: - Base search controller
 
 /// Класс, реализующий базовый контроллер поиска.
-open class BaseSearchController: UISearchController {
+open class BaseSearchController: UISearchController, Sendable {
     
     // MARK: Initialization
     
