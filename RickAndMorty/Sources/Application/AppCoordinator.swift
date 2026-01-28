@@ -1,18 +1,19 @@
 import UIKit
+import Navigation
+import DependencyInjection
 
 // MARK: - Application coodrinator
 
-/// Класс, реалищующий интерфейс координатора и
+/// Класс, реализующий интерфейс координатора и
 /// являющийся главным координатором приложения.
-final class AppCoordinator: Coordinator {
+@MainActor final class AppCoordinator: Sendable {
     
     // MARK: Properties
     
     let diContainer: DIContainer
     var childCoordinators: [Coordinator] = []
-    var rootViewController: RnMTabBarController?
+    var rootViewController: TabBarController?
     var navController: UINavigationController? { nil }
-    
     var didFinish: ((Coordinator) -> Void)?
     
     // MARK: Initialization
@@ -22,17 +23,15 @@ final class AppCoordinator: Coordinator {
     init(di diContainer: DIContainer) {
         self.diContainer = diContainer
     }
-    
-    // MARK: Coordinator protocol implementation
+}
+ 
+// MARK: - Coordinator protocol implementation
+
+extension AppCoordinator: Coordinator {
     
     func start() -> UIViewController {
-        let tabBarController = RnMTabBarController()
+        let tabBarController = diContainer.resolve(TabBarController.self)
         rootViewController = tabBarController
-        tabBarController.viewControllers = [
-            startCharactersCoordinator(),
-            startLocationsCoordinator(),
-            startEpisodesCoordinator(),
-        ]
         
         return tabBarController
     }
@@ -42,53 +41,5 @@ final class AppCoordinator: Coordinator {
         rootViewController?.selectedIndex = 0
         
         return self
-    }
-}
-
-// MARK: - Coordinator support functions
-
-private extension AppCoordinator {
-    
-    /// Выполняет запуск потока координатора персонажей.
-    func startCharactersCoordinator() -> UIViewController {
-        let coordinator = diContainer.resolve(RnMCharactersCoordinator.self)
-        coordinator.didFinish = { [weak self] coordinator in
-            self?.removeChild(coordinator)
-        }
-        addChild(coordinator)
-        
-        let viewController = coordinator.start()
-        rootViewController?.setupViewControllerTabItem(for: viewController, item: .characters)
-        
-        return viewController
-    }
-    
-    /// Выполняет запуск потока координатора локаций.
-    func startLocationsCoordinator() -> UIViewController {
-        // let coordinator: Coordinator = RnMLocationsCoodrinator(di: diContainer)
-        // coordinator.didFinish = { [weak self] coordinator in
-        //     self?.removeChild(coordinator)
-        // }
-        // addChild(coordinator)
-        
-        let viewController = UIViewController() // coordinator.start()
-        rootViewController?.setupViewControllerTabItem(for: viewController, item: .locations)
-        
-        return viewController
-    }
-    
-    /// Выполняет запуск потока координатора эпизодов.
-    func startEpisodesCoordinator() -> UIViewController {
-        // let coordinator: Coordinator = RnMEpisodesCoodrinator(di: diContainer)
-        // coordinator.didFinish = { [weak self] coordinator in
-        //     self?.removeChild(coordinator)
-        // }
-        // addChild(coordinator)
-        
-        let viewController = UIViewController() // coordinator.start()
-        //
-        rootViewController?.setupViewControllerTabItem(for: viewController, item: .episodes)
-        
-        return viewController
     }
 }

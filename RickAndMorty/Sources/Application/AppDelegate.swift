@@ -6,13 +6,13 @@ import UIKit
     
     // MARK: Properties
     
-    var appDIContainer: AppDIContainer!
-    var appCoordinator: AppCoordinator!
+    private var appDIContainer: AppDIContainer!
+    private var appCoordinator: AppCoordinator!
     
     var window: UIWindow?
 }
 
-// MARK: - UI application delegate implementation
+// MARK: - UI application delegate protocol implementation
 
 extension AppDelegate: UIApplicationDelegate {
     
@@ -37,7 +37,7 @@ private extension AppDelegate {
         appDIContainer = AppDIContainer()
         
         let appDIAssembly = AppDIAssembly()
-        appDIAssembly.assemble(container: appDIContainer)
+        appDIAssembly.assemble(in: appDIContainer)
     }
     
     /// Выполняет настройку координатора приложения.

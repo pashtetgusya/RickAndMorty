@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		E56766FB2DEF2BCE0086706F /* CombineCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = E56766FA2DEF2BCE0086706F /* CombineCocoa */; };
+		E5ED47E52F27A9D1003F39FB /* DependencyInjection in Frameworks */ = {isa = PBXBuildFile; productRef = E5ED47E42F27A9D1003F39FB /* DependencyInjection */; };
+		E5ED47E82F27A9DC003F39FB /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = E5ED47E72F27A9DC003F39FB /* Navigation */; };
+		E5ED47EB2F27A9E8003F39FB /* NetWork in Frameworks */ = {isa = PBXBuildFile; productRef = E5ED47EA2F27A9E8003F39FB /* NetWork */; };
+		E5ED47EE2F27A9F6003F39FB /* Resources in Frameworks */ = {isa = PBXBuildFile; productRef = E5ED47ED2F27A9F6003F39FB /* Resources */; };
+		E5ED47F12F27AA04003F39FB /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = E5ED47F02F27AA04003F39FB /* Storage */; };
+		E5ED47F42F27AA11003F39FB /* UIComponents in Frameworks */ = {isa = PBXBuildFile; productRef = E5ED47F32F27AA11003F39FB /* UIComponents */; };
+		E5ED47F72F27AA1D003F39FB /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = E5ED47F62F27AA1D003F39FB /* Data */; };
+		E5ED47FA2F27AA2B003F39FB /* Characters in Frameworks */ = {isa = PBXBuildFile; productRef = E5ED47F92F27AA2B003F39FB /* Characters */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,7 +77,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5ED47F12F27AA04003F39FB /* Storage in Frameworks */,
+				E5ED47E82F27A9DC003F39FB /* Navigation in Frameworks */,
+				E5ED47EB2F27A9E8003F39FB /* NetWork in Frameworks */,
+				E5ED47F42F27AA11003F39FB /* UIComponents in Frameworks */,
+				E5ED47FA2F27AA2B003F39FB /* Characters in Frameworks */,
 				E56766FB2DEF2BCE0086706F /* CombineCocoa in Frameworks */,
+				E5ED47E52F27A9D1003F39FB /* DependencyInjection in Frameworks */,
+				E5ED47F72F27AA1D003F39FB /* Data in Frameworks */,
+				E5ED47EE2F27A9F6003F39FB /* Resources in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +147,14 @@
 			name = RickAndMorty;
 			packageProductDependencies = (
 				E56766FA2DEF2BCE0086706F /* CombineCocoa */,
+				E5ED47E42F27A9D1003F39FB /* DependencyInjection */,
+				E5ED47E72F27A9DC003F39FB /* Navigation */,
+				E5ED47EA2F27A9E8003F39FB /* NetWork */,
+				E5ED47ED2F27A9F6003F39FB /* Resources */,
+				E5ED47F02F27AA04003F39FB /* Storage */,
+				E5ED47F32F27AA11003F39FB /* UIComponents */,
+				E5ED47F62F27AA1D003F39FB /* Data */,
+				E5ED47F92F27AA2B003F39FB /* Characters */,
 			);
 			productName = RickAndMorty;
 			productReference = E54CB66E2DD838ED00ABB462 /* RickAndMorty.app */;
@@ -216,6 +240,14 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E56766F92DEF2BCE0086706F /* XCRemoteSwiftPackageReference "CombineCocoa" */,
+				E5ED47E32F27A9D1003F39FB /* XCLocalSwiftPackageReference "Modules/Core/DependencyInjection" */,
+				E5ED47E62F27A9DC003F39FB /* XCLocalSwiftPackageReference "Modules/Core/Navigation" */,
+				E5ED47E92F27A9E8003F39FB /* XCLocalSwiftPackageReference "Modules/Core/NetWork" */,
+				E5ED47EC2F27A9F6003F39FB /* XCLocalSwiftPackageReference "Modules/Core/Resources" */,
+				E5ED47EF2F27AA04003F39FB /* XCLocalSwiftPackageReference "Modules/Core/Storage" */,
+				E5ED47F22F27AA11003F39FB /* XCLocalSwiftPackageReference "Modules/Core/UIComponents" */,
+				E5ED47F52F27AA1D003F39FB /* XCLocalSwiftPackageReference "Modules/Data" */,
+				E5ED47F82F27AA2B003F39FB /* XCLocalSwiftPackageReference "Modules/Features/Characters" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E54CB66F2DD838ED00ABB462 /* Products */;
@@ -607,6 +639,41 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		E5ED47E32F27A9D1003F39FB /* XCLocalSwiftPackageReference "Modules/Core/DependencyInjection" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Core/DependencyInjection;
+		};
+		E5ED47E62F27A9DC003F39FB /* XCLocalSwiftPackageReference "Modules/Core/Navigation" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Core/Navigation;
+		};
+		E5ED47E92F27A9E8003F39FB /* XCLocalSwiftPackageReference "Modules/Core/NetWork" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Core/NetWork;
+		};
+		E5ED47EC2F27A9F6003F39FB /* XCLocalSwiftPackageReference "Modules/Core/Resources" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Core/Resources;
+		};
+		E5ED47EF2F27AA04003F39FB /* XCLocalSwiftPackageReference "Modules/Core/Storage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Core/Storage;
+		};
+		E5ED47F22F27AA11003F39FB /* XCLocalSwiftPackageReference "Modules/Core/UIComponents" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Core/UIComponents;
+		};
+		E5ED47F52F27AA1D003F39FB /* XCLocalSwiftPackageReference "Modules/Data" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Data;
+		};
+		E5ED47F82F27AA2B003F39FB /* XCLocalSwiftPackageReference "Modules/Features/Characters" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/Features/Characters;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		E56766F92DEF2BCE0086706F /* XCRemoteSwiftPackageReference "CombineCocoa" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -623,6 +690,38 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E56766F92DEF2BCE0086706F /* XCRemoteSwiftPackageReference "CombineCocoa" */;
 			productName = CombineCocoa;
+		};
+		E5ED47E42F27A9D1003F39FB /* DependencyInjection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DependencyInjection;
+		};
+		E5ED47E72F27A9DC003F39FB /* Navigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Navigation;
+		};
+		E5ED47EA2F27A9E8003F39FB /* NetWork */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetWork;
+		};
+		E5ED47ED2F27A9F6003F39FB /* Resources */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Resources;
+		};
+		E5ED47F02F27AA04003F39FB /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Storage;
+		};
+		E5ED47F32F27AA11003F39FB /* UIComponents */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UIComponents;
+		};
+		E5ED47F62F27AA1D003F39FB /* Data */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Data;
+		};
+		E5ED47F92F27AA2B003F39FB /* Characters */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Characters;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

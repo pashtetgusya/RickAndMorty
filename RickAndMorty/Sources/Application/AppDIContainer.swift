@@ -1,9 +1,10 @@
 import Foundation
+import DependencyInjection
 
 // MARK: - Application dependency injection container
 
 /// Класс, реализующий интерфейс `DI`-контейнера для управления зависимостями приложения.
-final class AppDIContainer: DIContainer {
+final class AppDIContainer {
     
     /// Мьютекс для обеспечения потокобезопасности при работе с контейнером зависимостей.
     private let lock = NSRecursiveLock()
@@ -11,8 +12,11 @@ final class AppDIContainer: DIContainer {
     nonisolated(unsafe) private var services: [String: DIService] = [:]
     /// Контейнер для регистации / получения синглтон зависимостей.
     nonisolated(unsafe) private var singletonServices: [String: Any] = [:]
-    
-    // MARK: DI container protocol implementation
+}
+
+// MARK: - DI container protocol implementation
+
+extension AppDIContainer: DIContainer {
     
     @discardableResult func register<Service>(
         _ type: Service.Type,
