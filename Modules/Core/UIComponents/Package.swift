@@ -14,10 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../Resources"),
-        .package(
-            url: "https://github.com/CombineCommunity/CombineCocoa.git",
-            from: "0.4.0"
-        )
+        .package(url: "https://github.com/CombineCommunity/CombineCocoa.git", from: "0.4.0")
     ],
     targets: [
         .target(
