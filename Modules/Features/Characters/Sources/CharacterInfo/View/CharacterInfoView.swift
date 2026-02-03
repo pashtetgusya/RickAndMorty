@@ -21,6 +21,17 @@ final class CharacterInfoView: BaseViewControllerView {
         return tableView
     }()
     
+    // MARK: Properties
+    
+    /// Конфигурация отображения процесса загрузки контента.
+    let loadingConfiguration: UIContentUnavailableConfiguration = {
+        var configuration = UIContentUnavailableConfiguration.loading()
+        configuration.text = "Please wait..."
+        configuration.secondaryText = "Fetching character info."
+        
+        return configuration
+    }()
+    
     // MARK: Initialization
     
     /// Создает новый экземпляр класса.

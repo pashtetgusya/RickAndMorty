@@ -91,6 +91,13 @@ private extension CharacterInfoViewController {
     /// Выполняет настройку подписок на события вью модели.
     func setupViewModelBindings() {
         viewModel
+            .$isLoading
+            .debounce(for: 0.3, scheduler: DispatchQueue.main)
+            .map { $0 ? self.contentView.loadingConfiguration : nil }
+            .assign(to: \.contentUnavailableConfiguration, on: self)
+            .store(in: &cancellables)
+        
+        viewModel
             .$characterName
             .map { $0 }
             .assign(to: \.title, on: navigationItem)
