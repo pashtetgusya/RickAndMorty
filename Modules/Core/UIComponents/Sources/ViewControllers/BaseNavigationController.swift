@@ -9,6 +9,13 @@ open class BaseNavigationController: UINavigationController {
     // MARK: Initialization
     
     /// Создает новый экземпляр класса.
+    public init() {
+        super.init(nibName: nil, bundle: nil)
+        
+        setupNavigationBar()
+    }
+    
+    /// Создает новый экземпляр класса.
     /// - Parameter viewController: корневой вью контроллер.
     public init(root viewController: UIViewController) {
         super.init(rootViewController: viewController)

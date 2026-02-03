@@ -1,6 +1,5 @@
 import Foundation
 import DependencyInjection
-import Characters
 
 // MARK: - Tab bar assembly
 
@@ -11,16 +10,8 @@ final class TabBarAssembly: DIAssembly {
     
     func assemble(in container: DIContainer) {
         container
-            .register(TabBarController.self) { container in
-                MainActor.assumeIsolated {
-                    let charactersController = container.resolve(CharactersCoordinator.self).start()
-                    
-                    let tabBarController = TabBarController()
-                    tabBarController.viewControllers = [ charactersController ]
-                    tabBarController.setupViewControllerTabItem(for: charactersController, item: .characters)
-                    
-                    return tabBarController
-                }
+            .register(TabBarController.self) { _ in
+                TabBarController()
             }
             .lifecycle(.singleton)
     }

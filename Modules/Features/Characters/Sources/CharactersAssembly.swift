@@ -1,4 +1,5 @@
 import Foundation
+import UIComponents
 import DependencyInjection
 
 // MARK: - Characters assembly
@@ -22,9 +23,9 @@ public final class CharactersAssembly: DIAssembly {
         assemblies.forEach { $0.assemble(in: container) }
         
         container
-            .register(CharactersCoordinator.self) { container in
+            .register(CharactersCoordinator.self) { (container, args: BaseNavigationController) in
                 MainActor.assumeIsolated {
-                    CharactersCoordinator(di: container)
+                    CharactersCoordinator(di: container, navController: args)
                 }
             }
             .implements(CharacterListCoordinator.self)

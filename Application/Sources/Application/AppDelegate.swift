@@ -1,4 +1,7 @@
 import UIKit
+import UIComponents
+import Navigation
+import DependencyInjection
 
 // MARK: - Application delegate
 
@@ -6,8 +9,8 @@ import UIKit
     
     // MARK: Properties
     
-    private var appDIContainer: AppDIContainer!
-    private var appCoordinator: AppCoordinator!
+    private var appDIContainer: DIContainer!
+    private var appCoordinator: Coordinator!
     
     var window: UIWindow?
 }
@@ -42,13 +45,16 @@ private extension AppDelegate {
     
     /// Выполняет настройку координатора приложения.
     func setupAppCoordinator() {
-        appCoordinator = AppCoordinator(di: appDIContainer)
+        let navController = BaseNavigationController()
+        appCoordinator = AppCoordinator(di: appDIContainer, navController: navController)
     }
     
     /// Выполняет настройку главного контроллера приложения.
     func setupRootViewControler() {
+        appCoordinator?.start()
+        
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = appCoordinator?.start()
+        window?.rootViewController = appCoordinator.navController
         window?.makeKeyAndVisible()
     }
 }

@@ -1,6 +1,8 @@
 import UIKit
+import UIComponents
 import Navigation
 import DependencyInjection
+import Characters
 
 // MARK: - Application coodrinator
 
@@ -12,16 +14,20 @@ import DependencyInjection
     
     let diContainer: DIContainer
     var childCoordinators: [Coordinator] = []
-    var rootViewController: TabBarController?
-    var navController: UINavigationController? { nil }
+    var navController: UINavigationController
     var didFinish: ((Coordinator) -> Void)?
     
     // MARK: Initialization
     
     /// Создает новый экземпляр класса.
     /// - Parameter diContainer: контейнер с зависимостями.
-    init(di diContainer: DIContainer) {
+    /// - Parameter navController: навигационный контроллер.
+    init(
+        di diContainer: DIContainer,
+        navController: UINavigationController
+    ) {
         self.diContainer = diContainer
+        self.navController = navController
     }
 }
  
@@ -29,16 +35,27 @@ import DependencyInjection
 
 extension AppCoordinator: Coordinator {
     
-    func start() -> UIViewController {
-        let tabBarController = diContainer.resolve(TabBarController.self)
-        rootViewController = tabBarController
+    func start() {
+        let charactersNavController = BaseNavigationController()
+        let charactersCoordinator = diContainer.resolve(
+            CharactersCoordinator.self,
+            args: charactersNavController
+        )
         
-        return tabBarController
+        let tabBarController = diContainer.resolve(TabBarController.self)
+        tabBarController.setupViewControllerTabItem(for: charactersNavController, item: .characters)
+        tabBarController.viewControllers = [charactersNavController]
+        
+        navController.setNavigationBarHidden(true, animated: false)
+        navController.viewControllers = [tabBarController]
+        
+        childCoordinators = [charactersCoordinator]
+        childCoordinators.forEach { $0.start() }
     }
     
     func resetToRoot() -> Self {
         childCoordinators.forEach { $0.resetToRoot(animated: false) }
-        rootViewController?.selectedIndex = 0
+        (navController.viewControllers.first as? TabBarController)?.selectedIndex = 0
         
         return self
     }

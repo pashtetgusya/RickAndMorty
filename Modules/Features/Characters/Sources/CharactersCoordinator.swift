@@ -13,14 +13,19 @@ import DependencyInjection
     public let diContainer: DIContainer
     public var childCoordinators: [Coordinator]
     public var didFinish: ((Coordinator) -> Void)?
-    public var navController: UINavigationController?
+    public var navController: UINavigationController
     
     // MARK: Initialization
     
     /// Создает новый экземпляр класса.
     /// - Parameter diContainer: контейнер с зависимостями.
-    public init(di diContainer: DIContainer) {
+    /// - Parameter navController: навигационный контроллер.
+    public init(
+        di diContainer: DIContainer,
+        navController: UINavigationController
+    ) {
         self.diContainer = diContainer
+        self.navController = navController
         self.childCoordinators = []
     }
 }
@@ -29,12 +34,9 @@ import DependencyInjection
 
 extension CharactersCoordinator: Coordinator {
     
-    @discardableResult public func start() -> UIViewController {
+    public func start() {
         let viewController = diContainer.resolve(CharacterListViewController.self)
-        let navController = BaseNavigationController(root: viewController)
-        self.navController = navController
-        
-        return navController
+        navController.pushViewController(viewController, animated: true)
     }
 }
 
@@ -53,7 +55,7 @@ extension CharactersCoordinator: CharacterListCoordinator {
         let navController = BaseNavigationController(root: viewController)
         navController.modalPresentationStyle = .pageSheet
         
-        self.navController?.present(navController, animated: true)
+        self.navController.present(navController, animated: true)
     }
     
     func presentCharacterInfoView(for characterId: Int) {
@@ -62,6 +64,6 @@ extension CharactersCoordinator: CharacterListCoordinator {
             args: characterId
         )
         
-        self.navController?.pushViewController(viewController, animated: true)
+        self.navController.pushViewController(viewController, animated: true)
     }
 }

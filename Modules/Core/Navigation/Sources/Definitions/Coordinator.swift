@@ -13,15 +13,14 @@ import DependencyInjection
     /// Список дочерних координаторов.
     var childCoordinators: [Coordinator] { get set }
     /// Навигационный контроллер координатора.
-    var navController: UINavigationController? { get }
+    var navController: UINavigationController { get }
     /// Замыкание, которе будет вызвано после завершения работы координатора.
     var didFinish: ((Coordinator) -> Void)? { get set }
     
     // MARK: Functions
     
     /// Выполняет запуск потока координатора.
-    /// - Returns: корневой `UIViewController` потока.
-    @discardableResult func start() -> UIViewController
+    func start()
     /// Выполняет сброс навигационного стека к корневому `UIViewController`.
     /// - Parameter animated: флаг необходимости выполнения анимации.
     /// - Returns: экземпрял координатора (для построения цепочки вызовов).
@@ -37,7 +36,7 @@ import DependencyInjection
 public extension Coordinator {
     
     func resetToRoot(animated: Bool) -> Self {
-        navController?.popToRootViewController(animated: animated)
+        navController.popToRootViewController(animated: animated)
         
         return self
     }
