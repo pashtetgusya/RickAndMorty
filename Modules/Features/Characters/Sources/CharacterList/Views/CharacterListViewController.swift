@@ -168,15 +168,19 @@ private extension CharacterListViewController {
         viewModel
             .$isLoading
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
-            .map { $0 ? self.contentView.loadingConfiguration : nil }
-            .assign(to: \.contentUnavailableConfiguration, on: self)
+            .sink { [weak self] isLoading in
+                let configuration = isLoading ? self?.contentView.loadingConfiguration : nil
+                self?.contentUnavailableConfiguration = configuration
+            }
             .store(in: &cancellables)
         
         viewModel
             .$isErrorLoading
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
-            .map { $0 ? self.contentView.errorLoadingConfiguration : nil }
-            .assign(to: \.contentUnavailableConfiguration, on: self)
+            .sink { [weak self] isErrorLoading in
+                let configuration = isErrorLoading ? self?.contentView.errorLoadingConfiguration : nil
+                self?.contentUnavailableConfiguration = configuration
+            }
             .store(in: &cancellables)
         
         viewModel

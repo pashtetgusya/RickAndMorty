@@ -66,7 +66,7 @@ import UIComponents
     /// Сервис для мониторинга статуса подключения к сети.
     private let networkMonitor: NetworkMonitor
     /// Координатор экрана списка персонажей.
-    private let coordinator: CharacterListCoordinator
+    private weak let coordinator: CharacterListCoordinator?
     /// Задача на загрузку следующей страницы списка.
     private var loadNextListPageTask: Task<(), Never>? = nil
     /// Задача на повторную загрузку списка.
@@ -251,7 +251,7 @@ extension CharacterListViewModel {
             gender: CharacterFilterTableViewModel.Section.Row.Gender(rawValue: filterCharacterGender) ?? .empty,
             status: CharacterFilterTableViewModel.Section.Row.Status(rawValue: filterCharacterStatus) ?? .empty
         )
-        coordinator.presentCharacterFilterView(with: currentFilter) { [weak self] filter in
+        coordinator?.presentCharacterFilterView(with: currentFilter) { [weak self] filter in
             Task { @MainActor [weak self] in
                 self?.filterCharacterGender = filter.gender.rawValue
                 self?.filterCharacterStatus = filter.status.rawValue
@@ -263,7 +263,7 @@ extension CharacterListViewModel {
     /// Выполняет отображение экрана информации о пресонаже.
     /// - Parameter characterId: идентификатор персонажа.
     func presentCharacterInfoView(for characterId: Int) {
-        coordinator.presentCharacterInfoView(for: characterId)
+        coordinator?.presentCharacterInfoView(for: characterId)
     }
 }
 
