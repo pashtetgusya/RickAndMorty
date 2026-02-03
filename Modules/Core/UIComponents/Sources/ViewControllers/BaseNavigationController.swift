@@ -4,7 +4,7 @@ import Resources
 // MARK: - Base navigation controller
 
 /// Класс, реализующий базовый навигационный контроллер.
-open class BaseNavigationController: UINavigationController {
+open class BaseNavigationController: UINavigationController, Sendable {
     
     // MARK: Initialization
     
