@@ -8,7 +8,7 @@ import Characters
 
 /// Класс, реализующий интерфейс координатора и
 /// являющийся главным координатором приложения.
-@MainActor final class AppCoordinator: Sendable {
+@MainActor final class AppCoordinator: NSObject, Sendable {
     
     // MARK: Properties
     
@@ -28,6 +28,10 @@ import Characters
     ) {
         self.diContainer = diContainer
         self.navController = navController
+        
+        super.init()
+        
+        self.navController.delegate = self
     }
 }
  
@@ -41,6 +45,9 @@ extension AppCoordinator: Coordinator {
             CharactersCoordinator.self,
             args: charactersNavController
         )
+        charactersCoordinator.didFinish = { [weak self] coordinator in
+            self?.childCoordinators.removeAll { $0 === coordinator }
+        }
         
         let tabBarController = diContainer.resolve(TabBarController.self)
         tabBarController.setupViewControllerTabItem(for: charactersNavController, item: .characters)
@@ -58,5 +65,26 @@ extension AppCoordinator: Coordinator {
         (navController.viewControllers.first as? TabBarController)?.selectedIndex = 0
         
         return self
+    }
+}
+
+// MARK: - UI navigation controller delegate protocol implementation
+
+extension AppCoordinator: UINavigationControllerDelegate {
+    
+    func navigationController(
+        _ navigationController: UINavigationController,
+        didShow viewController: UIViewController,
+        animated: Bool
+    ) {
+        guard
+            let transitionCoordinator = navigationController.transitionCoordinator,
+            let fromViewController = transitionCoordinator.viewController(forKey: .from),
+            !navigationController.viewControllers.contains(fromViewController)
+        else { return }
+        
+        if fromViewController is TabBarController {
+            childCoordinators.forEach { $0.didFinish?($0) }
+        }
     }
 }
