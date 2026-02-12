@@ -13,6 +13,5 @@ final class TabBarAssembly: DIAssembly {
             .register(TabBarController.self) { _ in
                 TabBarController()
             }
-            .lifecycle(.singleton)
     }
 }

@@ -10,11 +10,13 @@ public final class DIService {
     
     /// Время жизни зависимости в контейнере
     /// (по умолчанию испольузется `transient`).
-    @Atomic private(set) public var lifecycle: DILifeCycle = .transient
+    @Atomic private(set) var lifecycle: DILifeCycle = .transient
     /// Перечень интерфейсов которые реализует зависимость.
-    @Atomic private(set) public var conformingProtocolList: Set<String> = []
+    @Atomic private(set) var conformingProtocolList: Set<String> = []
     /// Замыкание, используемое для создания экземпляра зависимости.
     public let instanceFactory: Any
+    /// Хранилище с экземпляром зависимости.
+    @Atomic private(set) var instanseStorage: DIStorage?
     /// Контейнер в котором зарегистрирована зависимость.
     private weak var ownerContainer: DIContainer?
     
@@ -51,5 +53,15 @@ public final class DIService {
         ownerContainer?.updateRegistration(for: self)
         
         return self
+    }
+    
+    /// Выполняет сохранение экземпляра зависимости в хранилище.
+    /// - Parameter instance: экземпляр зависимости.
+    public func saveInstance(_ instance: Any) {
+        instanseStorage = switch lifecycle {
+        case .singleton: SingletonStorage(instance)
+        case .transient: TransientStorage()
+        case .weak: WeakStorage(instance)
+        }
     }
 }

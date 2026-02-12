@@ -37,7 +37,7 @@ private extension AppDelegate {
     
     /// Выполняет настройку контейнера с зависимостями приложения.
     func setupDIcontainer() {
-        appDIContainer = AppDIContainer()
+        appDIContainer = DIContainer()
         
         let appDIAssembly = AppDIAssembly()
         appDIAssembly.assemble(in: appDIContainer)

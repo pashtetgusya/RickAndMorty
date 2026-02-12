@@ -29,6 +29,6 @@ public final class CharactersAssembly: DIAssembly {
                 }
             }
             .implements(CharacterListCoordinator.self)
-            .lifecycle(.singleton)
+            .lifecycle(.weak)
     }
 }
