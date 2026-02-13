@@ -161,13 +161,15 @@ private extension CharacterListViewController {
     func setupViewModelBindings() {
         viewModel
             .$isRefreshing
-            .debounce(for: 0.3, scheduler: DispatchQueue.main)
+            .dropFirst()
+            .throttle(for: 0.6, scheduler: DispatchQueue.main, latest: true)
             .assign(to: \.isRefreshing, on: contentView.collectionView)
             .store(in: &cancellables)
         
         viewModel
             .$isLoading
-            .debounce(for: 0.3, scheduler: DispatchQueue.main)
+            .dropFirst()
+            .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] isLoading in
                 let configuration = isLoading ? self?.contentView.loadingConfiguration : nil
                 self?.contentUnavailableConfiguration = configuration
@@ -176,8 +178,10 @@ private extension CharacterListViewController {
         
         viewModel
             .$isErrorLoading
-            .debounce(for: 0.3, scheduler: DispatchQueue.main)
+            .dropFirst()
+            .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] isErrorLoading in
+                print(isErrorLoading)
                 let configuration = isErrorLoading ? self?.contentView.errorLoadingConfiguration : nil
                 self?.contentUnavailableConfiguration = configuration
             }

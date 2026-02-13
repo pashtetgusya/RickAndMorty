@@ -47,7 +47,7 @@ extension CharacterInfoViewController {
     }
 }
 
-// MARK: - UI table view delegate implementation
+// MARK: - UI table view delegate protocol implementation
 
 extension CharacterInfoViewController: UITableViewDelegate {
     
@@ -92,7 +92,8 @@ private extension CharacterInfoViewController {
     func setupViewModelBindings() {
         viewModel
             .$isLoading
-            .debounce(for: 0.3, scheduler: DispatchQueue.main)
+            .dropFirst()
+            .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
             .map { $0 ? self.contentView.loadingConfiguration : nil }
             .assign(to: \.contentUnavailableConfiguration, on: self)
             .store(in: &cancellables)

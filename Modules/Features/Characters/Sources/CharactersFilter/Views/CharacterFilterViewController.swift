@@ -48,7 +48,7 @@ extension CharacterFilterViewController {
     }
 }
 
-// MARK: - UI table view delegate implementation
+// MARK: - UI table view delegate protocol implementation
 
 extension CharacterFilterViewController: UITableViewDelegate {
     
