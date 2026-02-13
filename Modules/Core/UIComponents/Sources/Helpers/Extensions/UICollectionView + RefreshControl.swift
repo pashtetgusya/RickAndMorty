@@ -13,7 +13,12 @@ public extension UICollectionView {
             guard let refreshControl else { return }
             
             switch newValue {
-            case true where !refreshControl.isRefreshing: refreshControl.beginRefreshing()
+            case true where !refreshControl.isRefreshing:
+                refreshControl.beginRefreshing()
+                
+                let newY = contentOffset.y + -refreshControl.frame.size.height
+                let newOffset = CGPoint(x: 0, y: newY)
+                setContentOffset(newOffset, animated: true)
             case false where refreshControl.isRefreshing: refreshControl.endRefreshing()
             
             default: break
