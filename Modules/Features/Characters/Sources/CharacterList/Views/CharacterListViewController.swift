@@ -181,7 +181,6 @@ private extension CharacterListViewController {
             .dropFirst()
             .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] isErrorLoading in
-                print(isErrorLoading)
                 let configuration = isErrorLoading ? self?.contentView.errorLoadingConfiguration : nil
                 self?.contentUnavailableConfiguration = configuration
             }

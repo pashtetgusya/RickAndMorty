@@ -48,13 +48,13 @@ extension CharacterListCollectionViewCellViewModel {
         defer { loadCharacterImageTask = nil }
         
         loadCharacterImageTask = Task { [weak self] in
-            guard let self else { return }
+            guard let imageURL = self?.character.imageURL else { return }
             
-            defer { isLoading = false }
-            isLoading = true
+            defer { self?.isLoading = false }
+            self?.isLoading = true
             
-            let imageData = await imageRepository?.image(for: character.imageURL)
-            characterImageData = imageData
+            let imageData = await self?.imageRepository?.image(for: imageURL)
+            self?.characterImageData = imageData
         }
     }
     

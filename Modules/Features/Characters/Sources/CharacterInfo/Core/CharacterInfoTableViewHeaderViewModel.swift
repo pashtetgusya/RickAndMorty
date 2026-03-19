@@ -12,7 +12,7 @@ import Data
     /// Флаг выполнения загрузки изображения персонажа.
     @Published var isLoading: Bool = false
     /// Данные изображения персонажа.
-    @Published var characterImageData: Data = Data()
+    @Published var characterImageData: Data?
     /// Ссылка на загрузку изображения персонажа.
     private let imageURL: URL?
     
