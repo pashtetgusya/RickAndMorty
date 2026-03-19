@@ -12,10 +12,8 @@ final class CharacterListAssembly: DIAssembly {
     
     func assemble(in container: DIContainer) {
         container
-            .register(BaseSearchController.self) { _ in
-                MainActor.assumeIsolated {
-                    BaseSearchController()
-                }
+            .register(BaseSearchController.self) { @MainActor _ in
+                BaseSearchController()
             }
         
         container
@@ -24,27 +22,23 @@ final class CharacterListAssembly: DIAssembly {
             }
         
         container
-            .register(CharacterListViewModel.self) { container in
-                MainActor.assumeIsolated {
-                    let dependencies = container.resolve(CharacterListViewModelDependencies.self)
-                    let viewModel = CharacterListViewModel(di: dependencies)
-                    
-                    return viewModel
-                }
+            .register(CharacterListViewModel.self) { @MainActor container in
+                let dependencies = container.resolve(CharacterListViewModelDependencies.self)
+                let viewModel = CharacterListViewModel(di: dependencies)
+                
+                return viewModel
             }
         
         container
-            .register(CharacterListViewController.self) { container in
-                MainActor.assumeIsolated {
-                    let searchController = container.resolve(BaseSearchController.self)
-                    let viewModel = container.resolve(CharacterListViewModel.self)
-                    let viewController = CharacterListViewController(
-                        searchController: searchController,
-                        viewModel: viewModel
-                    )
-                    
-                    return viewController
-                }
+            .register(CharacterListViewController.self) { @MainActor container in
+                let searchController = container.resolve(BaseSearchController.self)
+                let viewModel = container.resolve(CharacterListViewModel.self)
+                let viewController = CharacterListViewController(
+                    searchController: searchController,
+                    viewModel: viewModel
+                )
+                
+                return viewController
             }
     }
 }

@@ -16,23 +16,25 @@ final class CharacterInfoAssembly: DIAssembly {
             }
         
         container
-            .register(CharacterInfoViewModel.self) { (container: DIContainer, characterId: Int) in
-                MainActor.assumeIsolated {
-                    let dependencies = container.resolve(CharacterInfoViewModelDependencies.self)
-                    let viewModel = CharacterInfoViewModel(characterId: characterId, di: dependencies)
-                    
-                    return viewModel
-                }
+            .register(CharacterInfoViewModel.self) { @MainActor (
+                container: DIContainer,
+                characterId: Int
+            ) -> CharacterInfoViewModel in
+                let dependencies = container.resolve(CharacterInfoViewModelDependencies.self)
+                let viewModel = CharacterInfoViewModel(characterId: characterId, di: dependencies)
+                
+                return viewModel
             }
         
         container
-            .register(CharacterInfoViewController.self) { (container: DIContainer, characterId: Int) in
-                MainActor.assumeIsolated {
-                    let viewModel = container.resolve(CharacterInfoViewModel.self, args: characterId)
-                    let viewController = CharacterInfoViewController(viewModel: viewModel)
-                    
-                    return viewController
-                }
+            .register(CharacterInfoViewController.self) { @MainActor (
+                container: DIContainer,
+                characterId: Int
+            ) -> CharacterInfoViewController in
+                let viewModel = container.resolve(CharacterInfoViewModel.self, args: characterId)
+                let viewController = CharacterInfoViewController(viewModel: viewModel)
+                
+                return viewController
             }
     }
 }

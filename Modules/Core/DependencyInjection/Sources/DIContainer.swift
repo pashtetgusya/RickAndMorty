@@ -28,7 +28,7 @@ public extension DIContainer {
     /// - Returns: экземпляр зависимости (для построения цепочки вызовов).
     @discardableResult func register<Service>(
         _ type: Service.Type,
-        _ resolver: @escaping (DIContainer) -> Service
+        _ resolver: @escaping @isolated(any) (DIContainer) -> Service
     ) -> DIService {
         _register(type, resolver)
     }
@@ -42,7 +42,7 @@ public extension DIContainer {
     /// - Returns: экземпляр зависимости (для построения цепочки вызовов).
     @discardableResult func register<Service, Arguments>(
         _ type: Service.Type,
-        _ resolver: @escaping (DIContainer, Arguments) -> Service
+        _ resolver: @escaping @isolated(any) (DIContainer, Arguments) -> Service
     ) -> DIService {
         _register(type, resolver)
     }
@@ -129,8 +129,10 @@ private extension DIContainer {
     /// - Returns: экземпляр зависимости (для построения цепочки вызовов).
     func _register<Service, Arguments>(
         _ type: Service.Type,
-        _ resolver: @escaping (Arguments) -> Service
+        _ resolver: @escaping @isolated(any) (Arguments) -> Service
     ) -> DIService {
+        // TODO: Fix warning or remove line after set min iOS to 18.0
+        let resolver = resolver as ((Arguments) -> Service)
         let service = DIService(container: self, factory: resolver)
         let primaryKey = String(describing: Service.self)
         services[primaryKey] = service

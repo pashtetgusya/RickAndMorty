@@ -11,30 +11,32 @@ final class CharacterFilterAssembly: DIAssembly {
     
     func assemble(in container: DIContainer) {
         container
-            .register(
-                CharacterFilterViewModel.self
-            ) { (_, args: (CharacterFilterTableViewModel.CharacterFilter,
-                           @Sendable (CharacterFilterTableViewModel.CharacterFilter) -> Void)) in
-                MainActor.assumeIsolated {
-                    let currentFilter = args.0
-                    let completion = args.1
-                    let viewModel = CharacterFilterViewModel(with: currentFilter, completion: completion)
-                    
-                    return viewModel
-                }
+            .register(CharacterFilterViewModel.self) { @MainActor (
+                _,
+                args: (
+                    CharacterFilterTableViewModel.CharacterFilter,
+                    @Sendable (CharacterFilterTableViewModel.CharacterFilter) -> Void
+                )
+            ) -> CharacterFilterViewModel in
+                let currentFilter = args.0
+                let completion = args.1
+                let viewModel = CharacterFilterViewModel(with: currentFilter, completion: completion)
+                
+                return viewModel
             }
         
         container
-            .register(
-                CharacterFilterViewController.self
-            ) { (container, args: (CharacterFilterTableViewModel.CharacterFilter,
-                                  @Sendable (CharacterFilterTableViewModel.CharacterFilter) -> Void)) in
-                MainActor.assumeIsolated {
-                    let viewModel = container.resolve(CharacterFilterViewModel.self, args: args)
-                    let viewController = CharacterFilterViewController(viewModel: viewModel)
-                    
-                    return viewController
-                }
+            .register(CharacterFilterViewController.self) { @MainActor (
+                container,
+                args: (
+                    CharacterFilterTableViewModel.CharacterFilter,
+                    @Sendable (CharacterFilterTableViewModel.CharacterFilter) -> Void
+                )
+            ) -> CharacterFilterViewController in
+                let viewModel = container.resolve(CharacterFilterViewModel.self, args: args)
+                let viewController = CharacterFilterViewController(viewModel: viewModel)
+                
+                return viewController
             }
     }
 }
