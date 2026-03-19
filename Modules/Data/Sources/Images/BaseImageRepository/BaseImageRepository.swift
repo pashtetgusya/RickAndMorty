@@ -5,7 +5,7 @@ import Storage
 // MARK: - Base image repository
 
 /// Актор, реализующий интерфейс репозитория для получения изображений.
-public actor BaseImageRepository {
+public final class BaseImageRepository {
     
     // MARK: Properties
     
@@ -54,7 +54,6 @@ private extension BaseImageRepository {
             return image
         }
         catch {
-            print(error.localizedDescription)
             return nil
         }
     }
@@ -70,7 +69,6 @@ private extension BaseImageRepository {
             return image
         }
         catch {
-            print(error.localizedDescription)
             return nil
         }
     }

@@ -2,8 +2,8 @@ import Foundation
 
 // MARK: - URL session HTTP client
 
-/// Актор, реализующий интерфейс `HTTP`-клиента на основе `URLSession`.
-public actor URLSessionHTTPClient {
+/// Класс, реализующий интерфейс `HTTP`-клиента на основе `URLSession`.
+public final class URLSessionHTTPClient {
     
     // MARK: Properties
     
