@@ -34,28 +34,21 @@ final class CharacterListView: BaseViewControllerView {
     // MARK: Properties
     
     /// Конфигурация отображения процесса загрузки контента.
-    let loadingConfiguration: UIContentUnavailableConfiguration = {
-        var configuration = UIContentUnavailableConfiguration.loading()
-        configuration.text = "Please wait..."
-        configuration.secondaryText = "Fetching character list."
-        
-        return configuration
-    }()
+    let loadingConfiguration = UIContentUnavailableConfiguration.loading(
+        title: "Please wait...",
+        subtitle: "Fetching character list."
+    )
     /// Конфигурация отображения ошибки загрузки контента.
-    var errorLoadingConfiguration: UIContentUnavailableConfiguration = {
-        var buttonConfiguration = UIButton.Configuration.borderless()
-        buttonConfiguration.title = "Retry"
-        buttonConfiguration.image = UIImage(systemName: "arrow.clockwise")
-        buttonConfiguration.baseForegroundColor = UIColor.applicationTintColor
-        
-        var configuration = UIContentUnavailableConfiguration.empty()
-        configuration.image = UIImage.charactersLoadError
-        configuration.text = "Oops..."
-        configuration.secondaryText = "Failed to load character list."
-        configuration.button = buttonConfiguration
-        
-        return configuration
-    }()
+    private(set) lazy var errorLoadingConfiguration = UIContentUnavailableConfiguration.error(
+        title: "Oops...",
+        subtitle: "Failed to load character list.",
+        icon: UIImage.charactersLoadError,
+        retryAction: UIAction { [weak self] _ in
+            self?.errorLoadingRetryTapAction?()
+        }
+    )
+    /// Экшн нажатия кнопки "Повторить" для `errorLoadingConfiguration`.
+    var errorLoadingRetryTapAction: (() -> Void)?
     
     // MARK: Initialization
     
