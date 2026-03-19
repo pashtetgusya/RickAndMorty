@@ -13,18 +13,18 @@ import UIComponents
     
     /// Флаг ошибки загрузки страницы списка.
     @Published var isErrorLoading: Bool = false
-    /// Флаг ошибки загрузки "следующей" страницы списка.
-    var isErrorNextPageLoading: Bool = false
     /// Флаг выполнения начальной / повторной загрузки списка.
     @Published var isLoading: Bool = false
     /// Флаг выполнения обновления списка.
     @Published var isRefreshing: Bool = false
     /// Флаг выполнения загрузки "следующей" страницы списка.
     @Published var isNextPageLoading: Bool = false
+    /// Флаг ошибки загрузки "следующей" страницы списка.
+    private var isErrorNextPageLoading: Bool = false
     /// Флаг загрузки последней страницы.
-    var isLastPageLoaded: Bool = false
+    private var isLastPageLoaded: Bool = false
     /// Текущая страница списка.
-    var currentListPage: Int = 1
+    private var currentListPage: Int = 1
     
     /// Строка для фильтрации загруженного списка персонажей по имени.
     @Published private var filterCharacterName: String = ""
@@ -33,10 +33,10 @@ import UIComponents
     /// Строка для фильтрации загруженного списка персонажей по гендеру.
     @Published private var filterCharacterGender: String = ""
     
-    /// Список персонажей с учетом фильтрации.
-    var characterList: AnyPublisher<[CharacterListCollectionViewModel.Section], Never> {
+    /// Список секций с персонажами.
+    var characterSectionList: AnyPublisher<[CharacterListCollectionViewModel.Section], Never> {
         Publishers
-            .CombineLatest($fullCharacterList, $filterCharacterName)
+            .CombineLatest($characterList, $filterCharacterName)
             .map { publishers in
                 var characterList = publishers.0
                 let name = publishers.1
@@ -57,7 +57,7 @@ import UIComponents
             .eraseToAnyPublisher()
     }
     /// Полный список персонажей.
-    @Published private var fullCharacterList: [CharacterListCollectionViewModel.Section.Row] = []
+    @Published private var characterList: [CharacterListCollectionViewModel.Section.Row] = []
     
     /// Репозиторий для получения персонажей.
     private let charactersRepository: CharactersRepository
@@ -131,7 +131,7 @@ extension CharacterListViewModel {
             defer { self?.isLoading = false }
             self?.isLoading = true
             
-            do { self?.fullCharacterList = try await self?.loadCharacterList() ?? [] }
+            do { self?.characterList = try await self?.loadCharacterList() ?? [] }
             catch { self?.isErrorLoading = true }
         }
     }
@@ -147,10 +147,10 @@ extension CharacterListViewModel {
             
             do {
                 self?.isErrorLoading = false
-                self?.fullCharacterList = try await self?.loadCharacterList() ?? []
+                self?.characterList = try await self?.loadCharacterList() ?? []
             }
             catch {
-                self?.fullCharacterList = []
+                self?.characterList = []
                 self?.isErrorLoading = true
             }
         }
@@ -158,8 +158,6 @@ extension CharacterListViewModel {
     
     /// Выполняет загрузку следующей страницы списка персонажей.
     func loadNextCharacterListPage() {
-        // Если уже есть задача на загрузку,
-        // то ничего не делаем и дожидаемся ее выполнения.
         guard
             !isLastPageLoaded,
             loadNextListPageTask == nil
@@ -168,13 +166,12 @@ extension CharacterListViewModel {
         loadNextListPageTask = Task { [weak self] in
             defer { self?.loadNextListPageTask = nil }
             defer { self?.isNextPageLoading = false }
-            
             self?.isNextPageLoading = true
             self?.currentListPage += 1
             
             do {
                 self?.isErrorNextPageLoading = false
-                self?.fullCharacterList += try await self?.loadCharacterList() ?? []
+                self?.characterList += try await self?.loadCharacterList() ?? []
             }
             catch HTTPRequestError.invalidStatusCode(404) { self?.isLastPageLoaded = true }
             catch { self?.isErrorNextPageLoading = true }
@@ -184,12 +181,12 @@ extension CharacterListViewModel {
     /// Выполняет загркузку списка персонажей.
     /// - Returns: список персонажей.
     private func loadCharacterList() async throws -> [CharacterListCollectionViewModel.Section.Row] {
-        let characterFilter = CharactersHTTPRequestFilter(
+        let charactersFilter = CharactersHTTPRequestFilter(
             page: currentListPage,
             status: .init(rawValue: filterCharacterStatus),
             gender: .init(rawValue: filterCharacterGender)
         )
-        let characterDTOList = try await charactersRepository.getCharacters(with: characterFilter)
+        let characterDTOList = try await charactersRepository.getCharacters(with: charactersFilter)
         let characterList = characterDTOList.map { CharacterListCollectionViewModel.Section.Row(dto: $0) }
         
         return characterList
@@ -210,11 +207,10 @@ extension CharacterListViewModel {
             self?.isLoading = true
             
             do {
-                let characterList = try await self?.loadCharacterList()
                 self?.isErrorLoading = false
-                self?.fullCharacterList = characterList?.filter({ character in
-                    self?.fullCharacterList.contains(character) == false
-                }) ?? []
+                self?.characterList = try await self?.loadCharacterList().filter { character in
+                    self?.characterList.contains(character) == false
+                } ?? []
             }
             catch { self?.isErrorLoading = true }
         }
@@ -230,11 +226,10 @@ extension CharacterListViewModel {
             self?.isNextPageLoading = true
             
             do {
-                let characterList = try await self?.loadCharacterList()
                 self?.isErrorNextPageLoading = false
-                self?.fullCharacterList += characterList?.filter({ character in
-                    self?.fullCharacterList.contains(character) == false
-                }) ?? []
+                self?.characterList += try await self?.loadCharacterList().filter { character in
+                    self?.characterList.contains(character) == false
+                } ?? []
             }
             catch { self?.isErrorNextPageLoading = true }
         }
@@ -278,7 +273,7 @@ private extension CharacterListViewModel {
             .isReachablePublisher
             .sink { [weak self] isReachable in
                 guard
-                    isReachable == true,
+                    isReachable,
                     self?.isErrorNextPageLoading == true
                 else { return }
                 

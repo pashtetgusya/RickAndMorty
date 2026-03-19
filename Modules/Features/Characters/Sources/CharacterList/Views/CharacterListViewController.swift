@@ -69,7 +69,7 @@ extension CharacterListViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupViews()
+        setupAppearance()
         setupViewBindings()
         setupViewModelBindings()
         viewModel.initialLoadCharacterList()
@@ -94,12 +94,9 @@ extension CharacterListViewController: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
+        guard let character = dataSource.itemIdentifier(for: indexPath) else { return }
+        
         collectionView.deselectItem(at: indexPath, animated: true)
-        
-        guard
-            let character = dataSource.itemIdentifier(for: indexPath)
-        else { return }
-        
         viewModel.presentCharacterInfoView(for: character.id)
     }
     
@@ -119,7 +116,7 @@ extension CharacterListViewController: UICollectionViewDelegate {
 private extension CharacterListViewController {
     
     /// Выпоняет настройку `view`-компонентов.
-    func setupViews() {
+    func setupAppearance() {
         contentView.collectionView.delegate = self
         searchController.searchResultsUpdater = self
         
@@ -150,9 +147,7 @@ private extension CharacterListViewController {
             .store(in: &cancellables)
         
         contentView
-            .errorLoadingConfiguration
-            .buttonProperties
-            .primaryAction = UIAction { [weak self] _ in
+            .errorLoadingRetryTapAction = { [weak self] in
                 self?.viewModel.retryLoadCharacterList()
             }
     }
@@ -187,11 +182,11 @@ private extension CharacterListViewController {
             .store(in: &cancellables)
         
         viewModel
-            .characterList
+            .characterSectionList
             .dropFirst()
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
-            .sink { [weak self] characterList in
-                self?.dataSource.update(with: characterList)
+            .sink { [weak self] characterSectionList in
+                self?.dataSource.update(with: characterSectionList)
             }
             .store(in: &cancellables)
     }

@@ -42,7 +42,7 @@ extension CharacterFilterViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupViews()
+        setupAppearance()
         setupViewBindings()
         setupViewModelBindings()
     }
@@ -72,9 +72,7 @@ extension CharacterFilterViewController: UITableViewDelegate {
         }
         selectedRows?.forEach { tableView.deselectRow(at: $0, animated: true) }
         
-        guard
-            let filter = dataSource.itemIdentifier(for: indexPath)
-        else { return }
+        guard let filter = dataSource.itemIdentifier(for: indexPath) else { return }
         
         viewModel.setNewFilter(filter)
     }
@@ -97,7 +95,7 @@ extension CharacterFilterViewController: UITableViewDelegate {
 private extension CharacterFilterViewController {
     
     /// Выпоняет настройку `view`-компонентов.
-    func setupViews() {
+    func setupAppearance() {
         contentView.tableView.delegate = self
         
         navigationController?.navigationBar.prefersLargeTitles = false

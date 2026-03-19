@@ -6,7 +6,7 @@ import Domain
 /// Модель данных коллекции экрана списка персонажей из вселенной `"Rick and Morty"`.
 enum CharacterListCollectionViewModel {
     
-    // MARK: Character info section
+    // MARK: Character list section
     
     /// Структура, описывающая секцию коллекции списка персонажей.
     struct Section: Equatable, Hashable {
@@ -25,7 +25,7 @@ enum CharacterListCollectionViewModel {
 extension CharacterListCollectionViewModel.Section {
     
     /// Энам, описывающий перечень возможных вариантов
-    /// секций таблцы списка персонажей.
+    /// секций коллекции списка персонажей.
     enum `Type`: Int, Equatable, Hashable {
         
         // MARK: Cases
@@ -39,6 +39,6 @@ extension CharacterListCollectionViewModel.Section {
 
 extension CharacterListCollectionViewModel.Section {
     
-    /// Структура, описывающая ячейку таблицы списка персонажей.
+    /// Структура, описывающая ячейку коллекции списка персонажей.
     typealias Row = Character
 }

@@ -20,9 +20,6 @@ final class CharacterListCollectionViewDataSource: UICollectionViewDiffableDataS
     
     // MARK: Properties
     
-    /// Флаг первого отображения данных в коллекции.
-    private var isFirstUpdate: Bool = true 
-    
     /// Обработчик создания ячеек коллекции по умолчанию.
     private static let defaultCellProvider: CellProvider = { collectionView, indexPath, character in
         let viewModel = CharacterListCollectionViewCellViewModel(character: character, imageRepository: nil)
@@ -76,13 +73,11 @@ extension CharacterListCollectionViewDataSource {
         animated: Bool = true
     ) {
         var snapshot = Snapshot()
-        
         sections.forEach {
             snapshot.appendSections([$0.type])
             snapshot.appendItems($0.rows, toSection: $0.type)
         }
         
-        apply(snapshot, animatingDifferences: animated && !isFirstUpdate)
-        if !isFirstUpdate { isFirstUpdate = false }
+        apply(snapshot, animatingDifferences: animated)
     }
 }

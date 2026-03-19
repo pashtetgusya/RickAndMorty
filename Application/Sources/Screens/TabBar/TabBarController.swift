@@ -14,7 +14,7 @@ extension TabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupTabBar()
+        setupAppearance()
     }
 }
 
@@ -22,8 +22,8 @@ extension TabBarController {
 
 extension TabBarController {
     
-    /// Выполняет настройку таб бара.
-    private func setupTabBar() {
+    /// Выпоняет настройку `view`-компонентов.
+    private func setupAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor.tabBarBackgroundColor

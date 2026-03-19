@@ -52,10 +52,9 @@ extension CharactersCoordinator: CharacterListCoordinator {
             CharacterFilterViewController.self,
             args: (currentFilter, completion)
         )
-        let navController = BaseNavigationController(root: viewController)
-        navController.modalPresentationStyle = .pageSheet
-        
-        self.navController.present(navController, animated: true)
+        let filterNavController = BaseNavigationController(root: viewController)
+        filterNavController.modalPresentationStyle = .pageSheet
+        navController.present(filterNavController, animated: true)
     }
     
     func presentCharacterInfoView(for characterId: Int) {
@@ -63,7 +62,6 @@ extension CharactersCoordinator: CharacterListCoordinator {
             CharacterInfoViewController.self,
             args: characterId
         )
-        
-        self.navController.pushViewController(viewController, animated: true)
+        navController.pushViewController(viewController, animated: true)
     }
 }

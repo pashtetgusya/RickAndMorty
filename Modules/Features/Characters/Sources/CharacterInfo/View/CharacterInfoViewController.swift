@@ -40,7 +40,7 @@ extension CharacterInfoViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupViews()
+        setupAppearance()
         setupViewModelBindings()
         
         viewModel.initialLoadCharacterInfo()
@@ -84,7 +84,7 @@ extension CharacterInfoViewController: UITableViewDelegate {
 private extension CharacterInfoViewController {
     
     /// Выпоняет настройку `view`-компонентов.
-    func setupViews() {
+    func setupAppearance() {
         contentView.tableView.delegate = self
     }
     

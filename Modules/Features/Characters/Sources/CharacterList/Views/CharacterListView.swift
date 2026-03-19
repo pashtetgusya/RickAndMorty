@@ -59,9 +59,6 @@ final class CharacterListView: BaseViewControllerView {
         addSubviews()
         setupConstraints()
     }
-    
-    @available(*, unavailable)
-    required init?(coder aDecoder: NSCoder) { nil }
 }
 
 // MARK: - View setup functions
