@@ -16,7 +16,8 @@ let project = Project(
         .local(path: "Modules/Core/UIComponents"),
         .local(path: "Modules/Data"),
         .local(path: "Modules/Domain"),
-        .local(path: "Modules/Features/Characters")
+        .local(path: "Modules/Features/Characters"),
+        .local(path: "Modules/Features/Episodes")
     ],
     settings: .settings(base: [
         "CURRENT_PROJECT_VERSION": "1",
@@ -48,6 +49,7 @@ let project = Project(
                 .package(product: "Data", type: .runtime, condition: nil),
                 .package(product: "Domain", type: .runtime, condition: nil),
                 .package(product: "Characters", type: .runtime, condition: nil),
+                .package(product: "Episodes", type: .runtime, condition: nil)
             ]
         )
     ],
