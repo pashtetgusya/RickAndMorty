@@ -3,6 +3,7 @@ import UIComponents
 import Navigation
 import DependencyInjection
 import Characters
+import Episodes
 
 // MARK: - Application coodrinator
 
@@ -14,7 +15,7 @@ import Characters
     
     let diContainer: DIContainer
     var childCoordinators: [Coordinator] = []
-    var navController: UINavigationController
+    let navController: UINavigationController
     var didFinish: ((Coordinator) -> Void)?
     
     // MARK: Initialization
@@ -49,14 +50,24 @@ extension AppCoordinator: Coordinator {
             self?.childCoordinators.removeAll { $0 === coordinator }
         }
         
+        let episodesNavController = BaseNavigationController()
+        let episodesCoordinator = diContainer.resolve(
+            EpisodesCoordinator.self,
+            args: episodesNavController
+        )
+        episodesCoordinator.didFinish = { [weak self] coordinator in
+            self?.childCoordinators.removeAll { $0 === coordinator }
+        }
+        
         let tabBarController = diContainer.resolve(TabBarController.self)
         tabBarController.setupViewControllerTabItem(for: charactersNavController, item: .characters)
-        tabBarController.viewControllers = [charactersNavController]
+        tabBarController.setupViewControllerTabItem(for: episodesNavController, item: .episodes)
+        tabBarController.viewControllers = [charactersNavController, episodesNavController]
         
         navController.setNavigationBarHidden(true, animated: false)
         navController.viewControllers = [tabBarController]
         
-        childCoordinators = [charactersCoordinator]
+        childCoordinators = [charactersCoordinator, episodesCoordinator]
         childCoordinators.forEach { $0.start() }
     }
     

@@ -4,6 +4,7 @@ import NetWork
 import Storage
 import DependencyInjection
 import Characters
+import Episodes
 
 // MARK: - Application dependency injection assembly
 
@@ -15,7 +16,8 @@ final class AppDIAssembly: DIAssembly {
     func assemble(in container: DIContainer) {
         let assemblies: [DIAssembly] = [
             TabBarAssembly(),
-            CharactersAssembly()
+            CharactersAssembly(),
+            EpisodesAssembly()
         ]
         assemblies.forEach { $0.assemble(in: container) }
         
