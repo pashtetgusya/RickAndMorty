@@ -27,10 +27,10 @@ final class CharacterListViewController: UIViewController {
         self.searchController = searchController
         self.dataSource = CharacterListCollectionViewDataSource(
             for: contentView.collectionView,
-            cellProvider: { [weak viewModel] collectionView, indexPath, character in
+            cellProvider: { [weak viewModel] collectionView, indexPath, itemIdentifier in
                 let cell: CharacterListCollectionViewCell = collectionView.dequeue(for: indexPath)
                 
-                if let cellViewModel = viewModel?.getCharacterCellViewModel(for: character) {
+                if let cellViewModel = viewModel?.getCharacterCellViewModel(for: itemIdentifier) {
                     cell.setup(with: cellViewModel)
                 }
                 
@@ -41,11 +41,13 @@ final class CharacterListViewController: UIViewController {
                 case UICollectionView.elementKindSectionFooter:
                     let footerView: SpinerCollectionFooterView = collectionView.dequeueFooter(for: indexPath)
                     let footerViewModel = viewModel?.getSpinerFoterViewModel()
-                    if let footerViewModel { footerView.setup(with: footerViewModel) }
+                    if let footerViewModel {
+                        footerView.setup(with: footerViewModel)
+                    }
                     
                     return footerView
                     
-                default: fatalError("collection supplementaryElement of \(elementKind) is not registered in collection")
+                default: return nil
                 }
             }
         )
@@ -117,7 +119,6 @@ private extension CharacterListViewController {
     
     /// Выпоняет настройку `view`-компонентов.
     func setupAppearance() {
-        contentView.collectionView.delegate = self
         searchController.searchResultsUpdater = self
         
         navigationItem.hidesSearchBarWhenScrolling = false
@@ -129,6 +130,8 @@ private extension CharacterListViewController {
     
     /// Выполняет настройку подписок на события вью.
     func setupViewBindings() {
+        contentView.collectionView.delegate = self
+        
         contentView
             .showCharacterFilterItem
             .tapPublisher

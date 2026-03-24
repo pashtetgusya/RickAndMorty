@@ -61,11 +61,11 @@ extension CharacterFilterViewModel {
     
     /// Выполняет установку нового значения фильтра для персонажей.
     /// - Parameter filter: новое значение фильтра.
-    func setNewFilter(_ filter: AnyFilter) {
-        if let genderFilter = filter.asFilter(CharacterFilterTableViewModel.Section.Row.Gender.self) {
+    func setNewFilter(_ filter: any Filter) {
+        if let genderFilter = filter as? CharacterFilterTableViewModel.Section.Row.Gender {
             newFilter.gender = genderFilter
         }
-        else if let statusFilter = filter.asFilter(CharacterFilterTableViewModel.Section.Row.Status.self) {
+        else if let statusFilter = filter as? CharacterFilterTableViewModel.Section.Row.Status {
             newFilter.status = statusFilter
         }
     }

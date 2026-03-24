@@ -21,8 +21,8 @@ final class CharacterListCollectionViewDataSource: UICollectionViewDiffableDataS
     // MARK: Properties
     
     /// Обработчик создания ячеек коллекции по умолчанию.
-    private static let defaultCellProvider: CellProvider = { collectionView, indexPath, character in
-        let viewModel = CharacterListCollectionViewCellViewModel(character: character, imageRepository: nil)
+    private static let defaultCellProvider: CellProvider = { collectionView, indexPath, itemIdentifier in
+        let viewModel = CharacterListCollectionViewCellViewModel(character: itemIdentifier, imageRepository: nil)
         let cell: CharacterListCollectionViewCell = collectionView.dequeue(for: indexPath)
         cell.setup(with: viewModel)
         
@@ -32,11 +32,9 @@ final class CharacterListCollectionViewDataSource: UICollectionViewDiffableDataS
     private static let defaultSupplementaryViewProvider: SupplementaryViewProvider = { collectionView, elementKind, indexPath in
         switch elementKind {
         case UICollectionView.elementKindSectionFooter:
-            let footerView: SpinerCollectionFooterView = collectionView.dequeueFooter(for: indexPath)
-            
-            return footerView
+            return collectionView.dequeueFooter(for: indexPath) as SpinerCollectionFooterView
         
-        default: fatalError("collection supplementaryElement of \(elementKind) is not registered in collection")
+        default: return nil
         }
     }
     
@@ -48,7 +46,7 @@ final class CharacterListCollectionViewDataSource: UICollectionViewDiffableDataS
     ///   - cellProvider: обработчик создания ячеек коллекции
     ///                   (по умолчанию используется `CharacterListCollectionViewDataSource.defaultCellProvider`).
     ///   - supplementaryViewProvider: обработчик создания хедеров / футеров коллекции
-    ///                   (по умолчанию используется `CharacterListCollectionViewDataSource.defaultSupplementaryViewProvider`).
+    ///                                (по умолчанию используется `CharacterListCollectionViewDataSource.defaultSupplementaryViewProvider`).
     init(
         for collectionView: UICollectionView,
         cellProvider: @escaping CellProvider = CharacterListCollectionViewDataSource.defaultCellProvider,

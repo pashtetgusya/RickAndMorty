@@ -15,13 +15,13 @@ final class CharacterFilterTableViewDataSource: UITableViewDiffableDataSource<
     typealias CellProvider = (UITableView, IndexPath, CharacterFilterTableViewModel.Section.Row) -> UITableViewCell?
     typealias Snapshot = NSDiffableDataSourceSnapshot<CharacterFilterTableViewModel.Section.`Type`,
                                                       CharacterFilterTableViewModel.Section.Row>
-                                                    
+    
     // MARK: Properties
     
     /// Обработчик создания ячеек по умолчанию.
-    private static let defaultCellProvider: CellProvider = { tableView, indexPath, filter in
+    private static let defaultCellProvider: CellProvider = { tableView, indexPath, itemIdentifier in
         let cell: FilterTalbieViewCell = tableView.dequeue(for: indexPath)
-        cell.setup(with: filter)
+        cell.setup(with: itemIdentifier.filter)
         
         return cell
     }

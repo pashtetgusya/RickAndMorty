@@ -32,7 +32,7 @@ public struct CharacterInfo: Sendable {
     /// Создает новый экземпляр структуры.
     /// - Parameters:
     ///   - characterDTO: `DTO` объект с информацией о персонаже.
-    ///   - episodeDTOList: список `DTO` объектов с информацией об эпиздах.
+    ///   - episodeDTOList: список `DTO` объектов с информацией о эпиздах.
     public init(
         characterDTO: CharacterDTO,
         episodeDTOList: [EpisodeDTO]

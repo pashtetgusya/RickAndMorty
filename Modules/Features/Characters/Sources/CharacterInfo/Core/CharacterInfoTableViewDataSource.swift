@@ -16,16 +16,13 @@ final class CharacterInfoTableViewDataSource: UITableViewDiffableDataSource<
     typealias CellProvider = (UITableView, IndexPath, CharacterInfoTableViewModel.Section.Row) -> UITableViewCell?
     typealias Snapshot = NSDiffableDataSourceSnapshot<CharacterInfoTableViewModel.Section.`Type`,
                                                       CharacterInfoTableViewModel.Section.Row>
-                                         
+    
     // MARK: Properties
     
-    /// Флаг первого отображения данных в таблице.
-    private var isFirstUpdate: Bool = true
-    
     /// Обработчик создания ячеек по умолчанию.
-    private static let defaultCellProvider: CellProvider = { tableView, indexPath, parameter in
+    private static let defaultCellProvider: CellProvider = { tableView, indexPath, itemIdentifier in
         let cell: ParameterTableViewCell = tableView.dequeue(for: indexPath)
-        cell.setup(with: parameter.erased)
+        cell.setup(with: itemIdentifier)
         
         return cell
     }
@@ -80,7 +77,6 @@ extension CharacterInfoTableViewDataSource {
             snapshot.appendItems($0.rows, toSection: $0.type)
         }
         
-        apply(snapshot, animatingDifferences: animated && !isFirstUpdate)
-        if !isFirstUpdate { isFirstUpdate = false }
+        apply(snapshot, animatingDifferences: animated)
     }
 }

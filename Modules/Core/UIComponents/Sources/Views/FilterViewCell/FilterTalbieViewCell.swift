@@ -73,7 +73,7 @@ public extension FilterTalbieViewCell {
     
     /// Выполняет настройку ячейки на основе фильтра.
     /// - Parameter filter: отображаемый фильтр.
-    func setup(with filter: AnyFilter) {
+    func setup(with filter: any Filter) {
         titleLabel.text = filter.rawValue
     }
 }

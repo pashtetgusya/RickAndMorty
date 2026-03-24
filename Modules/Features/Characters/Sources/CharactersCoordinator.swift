@@ -12,8 +12,8 @@ import DependencyInjection
     
     public let diContainer: DIContainer
     public var childCoordinators: [Coordinator]
+    public let navController: UINavigationController
     public var didFinish: ((Coordinator) -> Void)?
-    public var navController: UINavigationController
     
     // MARK: Initialization
     

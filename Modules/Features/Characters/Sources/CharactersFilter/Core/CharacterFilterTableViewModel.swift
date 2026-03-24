@@ -57,10 +57,31 @@ extension CharacterFilterTableViewModel.Section {
 
 extension CharacterFilterTableViewModel.Section {
     
-    typealias Row = AnyFilter
+    /// Структура, описывающая ячейку таблицы списка фильтров для персонажей.
+    struct Row: Equatable, Hashable {
+        
+        // MARK: Propeties
+        
+        /// Фильтр для персонажа.
+        let filter: any Filter
+        
+        // MARK: Hashable protocol implementation
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(filter.objectIdentifier)
+            hasher.combine(filter.rawValue)
+        }
+        
+        // MARK: Equtable protocol implementation
+        
+        static func == (lhs: Row, rhs: Row) -> Bool {
+            lhs.filter.objectIdentifier == rhs.filter.objectIdentifier &&
+            lhs.filter.rawValue == rhs.filter.rawValue
+        }
+    }
 }
 
-// MARK: -
+// MARK: - Character filter table view section rows
 
 extension CharacterFilterTableViewModel.Section.Row {
     
@@ -80,13 +101,17 @@ extension CharacterFilterTableViewModel.Section.Row {
         
         // MARK: Properties
         
+        var objectIdentifier: ObjectIdentifier { .init(Self.self) }
+        
+        // MARK: Case iterable protocol implementation
+        
         static var allCases: [CharacterFilterTableViewModel.Section.Row] {
             [
                 Gender.female,
                 Gender.male,
                 Gender.genderless,
                 Gender.unknown
-            ].map { $0.erased }
+            ].map { .init(filter: $0) }
         }
     }
     
@@ -105,12 +130,16 @@ extension CharacterFilterTableViewModel.Section.Row {
         
         // MARK: Properties
         
+        var objectIdentifier: ObjectIdentifier { .init(Self.self) }
+        
+        // MARK: Case iterable protocol implementation
+        
         static var allCases: [CharacterFilterTableViewModel.Section.Row] {
             [
                 Status.alive,
                 Status.dead,
                 Status.unknown
-            ].map { $0.erased }
+            ].map { .init(filter: $0) }
         }
     }
 

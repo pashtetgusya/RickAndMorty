@@ -72,9 +72,9 @@ extension CharacterFilterViewController: UITableViewDelegate {
         }
         selectedRows?.forEach { tableView.deselectRow(at: $0, animated: true) }
         
-        guard let filter = dataSource.itemIdentifier(for: indexPath) else { return }
+        guard let itemIdentifier = dataSource.itemIdentifier(for: indexPath) else { return }
         
-        viewModel.setNewFilter(filter)
+        viewModel.setNewFilter(itemIdentifier.filter)
     }
     
     func tableView(
@@ -82,8 +82,8 @@ extension CharacterFilterViewController: UITableViewDelegate {
         didDeselectRowAt indexPath: IndexPath
     ) {
         switch dataSource.sectionIdentifier(for: indexPath.section) {
-        case .gender: viewModel.setNewFilter(CharacterFilterTableViewModel.Section.Row.Gender.empty.erased)
-        case .status: viewModel.setNewFilter(CharacterFilterTableViewModel.Section.Row.Status.empty.erased)
+        case .gender: viewModel.setNewFilter(CharacterFilterTableViewModel.Section.Row.Gender.empty)
+        case .status: viewModel.setNewFilter(CharacterFilterTableViewModel.Section.Row.Status.empty)
         
         default: break
         }
@@ -96,8 +96,6 @@ private extension CharacterFilterViewController {
     
     /// Выпоняет настройку `view`-компонентов.
     func setupAppearance() {
-        contentView.tableView.delegate = self
-        
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.leftBarButtonItem = contentView.cancelItem
         navigationItem.rightBarButtonItem = contentView.applyFilterItem
@@ -106,6 +104,8 @@ private extension CharacterFilterViewController {
     
     /// Выполняет настройку подписок на события вью.
     func setupViewBindings() {
+        contentView.tableView.delegate = self
+        
         contentView
             .applyFilterItem
             .tapPublisher
@@ -138,10 +138,10 @@ private extension CharacterFilterViewController {
                 
                 dataSource.update(with: filterList)
                 
-                if let indexPath = dataSource.indexPath(for: viewModel.currentFilter.gender.erased) {
+                if let indexPath = dataSource.indexPath(for: .init(filter: viewModel.currentFilter.gender)) {
                     contentView.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
                 }
-                if let indexPath = dataSource.indexPath(for: viewModel.currentFilter.status.erased) {
+                if let indexPath = dataSource.indexPath(for: .init(filter: viewModel.currentFilter.status)) {
                     contentView.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
                 }
             }

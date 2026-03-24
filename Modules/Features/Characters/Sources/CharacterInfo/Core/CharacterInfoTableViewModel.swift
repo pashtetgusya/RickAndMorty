@@ -42,7 +42,8 @@ extension CharacterInfoTableViewModel.Section {
 
 extension CharacterInfoTableViewModel.Section {
     
-    /// Энам, описывающий перечень возможных ячеек с информацией о персонаже.
+    /// Энам, описывающий перечень возможных ячеек
+    /// с информацией о персонаже.
     enum Row: Parameter {
         
         // MARK: Cases
@@ -85,6 +86,12 @@ extension CharacterInfoTableViewModel.Section {
             case .originLocation(let description): description
             case .lastLocation(let description): description
             case .episode(let description): description
+            }
+        }
+        var withDisclosureIndicator: Bool {
+            switch self {
+            case .status, .gender, .originLocation, .lastLocation: false
+            case .episode: true
             }
         }
     }

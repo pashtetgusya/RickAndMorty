@@ -9,14 +9,6 @@ public protocol Filter: Equatable, Hashable, Sendable {
     
     /// Значение фильтра.
     var rawValue: String { get }
-}
-
-// MARK: - Filter protocol base implementation
-
-public extension Filter {
-    
-    /// Значение текущего фильтра со стертым типом.
-    var erased: AnyFilter {
-        AnyFilter(self)
-    }
+    /// Идентификатор типа фильтра.
+    var objectIdentifier: ObjectIdentifier { get }
 }

@@ -13,14 +13,6 @@ public protocol Parameter: Equatable, Hashable, Sendable {
     var name: String { get }
     /// Описание параметра.
     var description: String { get }
-}
-
-// MARK: - Parameter protocol base implementation
-
-public extension Parameter {
-    
-    /// Значение текущего параметра со стертым типом.
-    var erased: AnyParameter {
-        AnyParameter(self)
-    }
+    /// Флаг отображения перехода.
+    var withDisclosureIndicator: Bool { get }
 }
