@@ -38,6 +38,22 @@ extension CharactersCoordinator: Coordinator {
         let viewController = diContainer.resolve(CharacterListViewController.self)
         navController.pushViewController(viewController, animated: true)
     }
+    
+    /// Выполняет отображение модального экрана с информацией о персонаже.
+    /// - Parameter characterId: идентификатор персонажа
+    public func presentCharacterInfoSheetView(for characterId: Int) {
+        let viewController = diContainer.resolve(CharacterInfoViewController.self, args: characterId)
+        viewController.navigationItem.leftBarButtonItem = .init(
+            systemItem: .close,
+            primaryAction: .init { [weak viewController] _ in
+                viewController?.dismiss(animated: true)
+            }
+        )
+        let characterNavController = BaseNavigationController(root: viewController)
+        characterNavController.modalPresentationStyle = .pageSheet
+        
+        navController.present(characterNavController, animated: true)
+    }
 }
 
 // MARK: - Character list coordinator protocol implementation

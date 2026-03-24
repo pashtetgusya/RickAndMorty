@@ -22,4 +22,9 @@ extension UIImage {
     public static let characterInfoLastLocationIcon = UIImage(named: "CharacterInfo_LastLocation_Icon") ?? UIImage()
     public static let characterInfoOriginLocationIcon = UIImage(named: "CharacterInfo_OriginLocation_Icon") ?? UIImage()
     public static let characterInfoStatusIcon = UIImage(named: "CharacterInfo_Status_Icon") ?? UIImage()
+    
+    public static let episodeInfoNumberIcon = UIImage(named: "EpisodeInfo_Number_Icon") ?? UIImage()
+    public static let episodeInfoSeasionIcon = UIImage(named: "EpisodeInfo_Seasion_Icon") ?? UIImage()
+    public static let episodeInfoReleaseDateIcon = UIImage(named: "EpisodeInfo_ReleaseDate_Icon") ?? UIImage()
+    public static let episodeInfoCharacterIcon = UIImage(named: "EpisodeInfo_Character_Icon") ?? UIImage()
 }

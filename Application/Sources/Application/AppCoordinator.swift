@@ -58,6 +58,9 @@ extension AppCoordinator: Coordinator {
         episodesCoordinator.didFinish = { [weak self] coordinator in
             self?.childCoordinators.removeAll { $0 === coordinator }
         }
+        episodesCoordinator.presentCharacterInfoView = { [weak charactersCoordinator] characterId in
+            charactersCoordinator?.presentCharacterInfoSheetView(for: characterId)
+        }
         
         let tabBarController = diContainer.resolve(TabBarController.self)
         tabBarController.setupViewControllerTabItem(for: charactersNavController, item: .characters)

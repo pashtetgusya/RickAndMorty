@@ -15,7 +15,10 @@ public final class EpisodesAssembly: DIAssembly {
     // MARK: DI assembly protocol implementation
     
     public func assemble(in container: DIContainer) {
-        let assemblies: [DIAssembly] = [EpisodeListAssembly()]
+        let assemblies: [DIAssembly] = [
+            EpisodeListAssembly(),
+            EpisodeInfoAssembly()
+        ]
         assemblies.forEach { $0.assemble(in: container) }
         
         container
@@ -26,6 +29,7 @@ public final class EpisodesAssembly: DIAssembly {
                 EpisodesCoordinator(di: container, navController: args)
             }
             .implements(EpisodeListCoordinator.self)
+            .implements(EpisodeInfoCoordinator.self)
             .lifecycle(.weak)
     }
 }
