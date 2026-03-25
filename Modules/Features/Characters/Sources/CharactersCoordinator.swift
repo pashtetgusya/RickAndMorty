@@ -14,6 +14,9 @@ import DependencyInjection
     public var childCoordinators: [Coordinator]
     public let navController: UINavigationController
     public var didFinish: ((Coordinator) -> Void)?
+    /// Замыкание, которое будет вызвано при срабатывании триггера
+    /// отображения экрана информации об эпизоде.
+    public var presentEpisodeInfoView: ((Int) -> Void)?
     
     // MARK: Initialization
     
@@ -51,8 +54,7 @@ extension CharactersCoordinator: Coordinator {
         )
         let characterNavController = BaseNavigationController(root: viewController)
         characterNavController.modalPresentationStyle = .pageSheet
-        
-        navController.present(characterNavController, animated: true)
+        navController.presentedOnTopViewController?.present(characterNavController, animated: true)
     }
 }
 
@@ -79,5 +81,14 @@ extension CharactersCoordinator: CharacterListCoordinator {
             args: characterId
         )
         navController.pushViewController(viewController, animated: true)
+    }
+}
+
+// MARK: - Character info coordinator protocol implementation
+
+extension CharactersCoordinator: CharacterInfoCoordinator {
+    
+    func presentEpisodeInfoView(for episodeId: Int) {
+        presentEpisodeInfoView?(episodeId)
     }
 }

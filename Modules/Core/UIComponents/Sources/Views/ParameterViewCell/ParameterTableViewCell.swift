@@ -87,6 +87,7 @@ public extension ParameterTableViewCell {
     /// - Parameter parameter: отображаемый параметр.
     func setup(with parameter: any Parameter) {
         accessoryType = parameter.withDisclosureIndicator ? .disclosureIndicator : .none
+        selectionStyle = parameter.withDisclosureIndicator ? .default : .none
         iconImageView.image = UIImage(data: parameter.icon)?.withTintColor(UIColor.applicationTintColor)
         nameLabel.text = parameter.name.capitalized
         valueLabel.text = parameter.description.capitalized

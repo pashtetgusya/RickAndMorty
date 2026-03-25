@@ -12,7 +12,7 @@ final class CharacterInfoView: BaseViewControllerView {
     let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.allowsSelection = false
+        tableView.allowsSelection = true
         tableView.allowsMultipleSelection = false
         tableView.backgroundColor = .clear
         tableView.registerCell(ParameterTableViewCell.self)

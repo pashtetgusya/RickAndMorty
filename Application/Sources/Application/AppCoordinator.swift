@@ -58,6 +58,10 @@ extension AppCoordinator: Coordinator {
         episodesCoordinator.didFinish = { [weak self] coordinator in
             self?.childCoordinators.removeAll { $0 === coordinator }
         }
+        
+        charactersCoordinator.presentEpisodeInfoView = { [weak episodesCoordinator] episodeId in
+            episodesCoordinator?.presentEpisodeInfoSheetView(for: episodeId)
+        }
         episodesCoordinator.presentCharacterInfoView = { [weak charactersCoordinator] characterId in
             charactersCoordinator?.presentCharacterInfoSheetView(for: characterId)
         }

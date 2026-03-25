@@ -22,8 +22,8 @@ import Domain
     @Published var characterName: String = ""
     /// Ссылка на изображение персонажа.
     private var characterImageURL: URL? = nil
-    /// Список секций с параметрами информации о персонаже.
-    @Published var characterInfoParameterList: [CharacterInfoTableViewModel.Section] = []
+    /// Список секций с информации о персонаже.
+    @Published var characterInfoSectionList: [CharacterInfoTableViewModel.Section] = []
     
     /// Репозиторий для получения персонажей.
     private let charactersRepository: CharactersRepository
@@ -31,8 +31,10 @@ import Domain
     private let episodesRepository: EpisodesRepository
     /// Репозиторий для получения изображений.
     private let imageRepository: ImageRepository
-    /// Сервис для мониторинга статуса подключения к сети,
+    /// Сервис для мониторинга статуса подключения к сети.
     private let networkMonitor: NetworkMonitor
+    /// Координатор экрана информации о персожане.
+    private weak let coordinator: CharacterInfoCoordinator?
     private var cancellables: Set<AnyCancellable> = []
     
     // MARK: Initialization
@@ -51,6 +53,7 @@ import Domain
         self.episodesRepository = dependencies.episodesRepository
         self.imageRepository = dependencies.imageRepository
         self.networkMonitor = dependencies.networkMonitor
+        self.coordinator = dependencies.coordinator
         
         self.setupBindings()
     }
@@ -74,19 +77,53 @@ extension CharacterInfoViewModel {
 
 extension CharacterInfoViewModel {
     
-    /// Выполняет начальную загрузку информации о персонаже.
-    func initialLoadCharacterInfo() {
-        runLoadCharacterInfoTask()
+    /// Выполняет загрузку информации о персонаже.
+    func loadCharacterInfo() {
+        Task { [weak self] in
+            guard let self else { return }
+            
+            defer { isLoading = false }
+            isLoading = true
+            
+            do {
+                let characterInfoDTO = try await charactersRepository.getCharacter(with: characterId)
+                let episodeIdList = characterInfoDTO.episodesInWhichAppeared.map { $0.id }
+                let episodeDTOList = try await episodesRepository.getEpisodes(with: episodeIdList)
+                let characterInfo = CharacterInfo(characterDTO: characterInfoDTO, episodeDTOList: episodeDTOList)
+                
+                let detailsSection = CharacterInfoTableViewModel.Section(
+                    type: .details,
+                    rows: [
+                        .status(description: characterInfo.status),
+                        .gender(description: characterInfo.gender),
+                        .originLocation(description: characterInfo.originLocationName),
+                        .lastLocation(description: characterInfo.lastLocationName),
+                    ]
+                )
+                let episodesSection = CharacterInfoTableViewModel.Section(
+                    type: .episodes,
+                    rows: zip(episodeIdList, characterInfo.episodeNamesInWhichAppeared).map { .episode(id: $0.0, description: $0.1) }
+                )
+                characterName = characterInfo.name
+                characterImageURL = characterInfo.imageURL
+                characterInfoSectionList = [detailsSection, episodesSection]
+                isErrorLoading = false
+            }
+            catch {
+                isErrorLoading = true
+            }
+        }
     }
 }
 
-// MARK: - View model retry functions
+// MARK: - View model navigation functions
 
 extension CharacterInfoViewModel {
     
-    /// Выполняет повторную загрузку информации о персонаже.
-    func retryLoadCharacterInfo() {
-        runLoadCharacterInfoTask()
+    /// Выполняет отображение экрана информации об эпизоде.
+    /// - Parameter episodeId: идентификатор эпизода.
+    func presentEpisodeInfoView(for episodeId: Int) {
+        coordinator?.presentEpisodeInfoView(for: episodeId)
     }
 }
 
@@ -105,66 +142,8 @@ private extension CharacterInfoViewModel {
                     self?.isErrorLoading == true
                 else { return }
                 
-                self?.retryLoadCharacterInfo()
+                self?.loadCharacterInfo()
             }
             .store(in: &cancellables)
-    }
-}
-
-// MARK: - View model support functions
-
-private extension CharacterInfoViewModel {
-    
-    /// Выполняет запуск задачи на загрузку информации о персонаже.
-    func runLoadCharacterInfoTask() {
-        Task { [weak self] in
-            defer { self?.isLoading = false }
-            self?.isLoading = true
-            
-            do {
-                guard let characterInfo = try await self?.getCharacterInfo() else { return }
-                
-                self?.characterName = characterInfo.name
-                self?.characterImageURL = characterInfo.imageURL
-                self?.characterInfoParameterList = self?.getCharacterInfoSectionList(for: characterInfo) ?? []
-                self?.isErrorLoading = false
-            }
-            catch { self?.isErrorLoading = true }
-        }
-    }
-    
-    /// Выполняет загрузку информации о персонаже.
-    /// - Returns: структура с информацией о персонаже.
-    func getCharacterInfo() async throws -> CharacterInfo {
-        let characterInfoDTO = try await charactersRepository.getCharacter(with: characterId)
-        let episodeIdList = characterInfoDTO.episodesInWhichAppeared.map { $0.id }
-        let episodeDTOList = try await episodesRepository.getEpisodes(with: episodeIdList)
-        let characterInfo = CharacterInfo(characterDTO: characterInfoDTO, episodeDTOList: episodeDTOList)
-        
-        return characterInfo
-    }
-    
-    /// Выполняет загрузку списка секций с информацией о персонаже на основе переданной структуры.
-    /// - Parameter characterInfo: структура с информацией о персонаже.
-    /// - Returns: список секций с информацией о персонаже.
-    func getCharacterInfoSectionList(
-        for characterInfo: CharacterInfo
-    ) -> [CharacterInfoTableViewModel.Section] {
-        let detailsSection = CharacterInfoTableViewModel.Section(
-            type: .details,
-            rows: [
-                .status(description: characterInfo.status),
-                .gender(description: characterInfo.gender),
-                .originLocation(description: characterInfo.originLocationName),
-                .lastLocation(description: characterInfo.lastLocationName),
-            ]
-        )
-        let episodesSection = CharacterInfoTableViewModel.Section(
-            type: .episodes,
-            rows: characterInfo.episodeNamesInWhichAppeared.map { .episode(description: $0) }
-        )
-        let sectionList = [detailsSection, episodesSection]
-        
-        return sectionList
     }
 }

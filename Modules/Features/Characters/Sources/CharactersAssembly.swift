@@ -30,6 +30,7 @@ public final class CharactersAssembly: DIAssembly {
                 CharactersCoordinator(di: container, navController: args)
             }
             .implements(CharacterListCoordinator.self)
+            .implements(CharacterInfoCoordinator.self)
             .lifecycle(.weak)
     }
 }

@@ -19,6 +19,8 @@ struct CharacterInfoViewModelDependencies {
     let imageRepository: ImageRepository
     /// Сервис для мониторинга статуса подключения к сети.
     let networkMonitor: NetworkMonitor
+    /// Координатор экрана информации о персожане.
+    let coordinator: CharacterInfoCoordinator
     
     // MARK: Initialization
     
@@ -29,5 +31,6 @@ struct CharacterInfoViewModelDependencies {
         self.episodesRepository = diContainer.resolve(EpisodesRepository.self)
         self.imageRepository = diContainer.resolve(ImageRepository.self)
         self.networkMonitor = diContainer.resolve(NetworkMonitor.self)
+        self.coordinator = diContainer.resolve(CharacterInfoCoordinator.self)
     }
 }

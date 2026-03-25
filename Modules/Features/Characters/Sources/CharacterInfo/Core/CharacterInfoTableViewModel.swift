@@ -57,7 +57,7 @@ extension CharacterInfoTableViewModel.Section {
         /// Последнее известное местоположение персонажа.
         case lastLocation(description: String)
         /// Эпизод в котором встречается персонаж.
-        case episode(description: String)
+        case episode(id: Int, description: String)
         
         // MARK: Properties
         
@@ -85,7 +85,7 @@ extension CharacterInfoTableViewModel.Section {
             case .gender(let description): description
             case .originLocation(let description): description
             case .lastLocation(let description): description
-            case .episode(let description): description
+            case .episode(_, let description): description
             }
         }
         var withDisclosureIndicator: Bool {

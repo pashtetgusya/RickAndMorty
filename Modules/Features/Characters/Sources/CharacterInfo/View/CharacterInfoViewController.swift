@@ -42,7 +42,7 @@ extension CharacterInfoViewController {
         
         setupViewBindings()
         setupViewModelBindings()
-        viewModel.initialLoadCharacterInfo()
+        viewModel.loadCharacterInfo()
     }
 }
 
@@ -76,6 +76,23 @@ extension CharacterInfoViewController: UITableViewDelegate {
             headerView.textLabel?.textColor = UIColor.textSubColor
         }
     }
+    
+    func tableView(
+        _ tableView: UITableView,
+        willSelectRowAt indexPath: IndexPath
+    ) -> IndexPath? {
+        dataSource.sectionIdentifier(for: indexPath.section) == .episodes ? indexPath : nil
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath
+    ) {
+        guard case .episode(let id, _) = dataSource.itemIdentifier(for: indexPath) else { return }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        viewModel.presentEpisodeInfoView(for: id)
+    }
 }
 
 // MARK: - Controller setup functions
@@ -104,7 +121,7 @@ private extension CharacterInfoViewController {
             .store(in: &cancellables)
         
         viewModel
-            .$characterInfoParameterList
+            .$characterInfoSectionList
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
             .sink { [weak self] parameterList in
                 self?.dataSource.update(with: parameterList)
