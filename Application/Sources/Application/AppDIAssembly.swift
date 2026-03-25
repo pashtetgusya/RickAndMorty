@@ -3,6 +3,7 @@ import Data
 import NetWork
 import Storage
 import DependencyInjection
+import UIComponents
 import Characters
 import Episodes
 
@@ -20,6 +21,15 @@ final class AppDIAssembly: DIAssembly {
             EpisodesAssembly()
         ]
         assemblies.forEach { $0.assemble(in: container) }
+        
+        container
+            .register(AppCoordinator.self) { @MainActor (
+                container,
+                args: BaseNavigationController
+            ) -> AppCoordinator in
+                AppCoordinator(di: container, navController: args)
+            }
+            .lifecycle(.singleton)
         
         container
             .register(HTTPClient.self) { _ in

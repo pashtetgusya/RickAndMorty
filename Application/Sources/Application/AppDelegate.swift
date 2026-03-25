@@ -46,7 +46,7 @@ private extension AppDelegate {
     /// Выполняет настройку координатора приложения.
     func setupAppCoordinator() {
         let navController = BaseNavigationController()
-        appCoordinator = AppCoordinator(di: appDIContainer, navController: navController)
+        appCoordinator = appDIContainer.resolve(AppCoordinator.self, args: navController)
     }
     
     /// Выполняет настройку главного контроллера приложения.
