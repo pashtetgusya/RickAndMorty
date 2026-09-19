@@ -31,10 +31,21 @@ let project = Project(
             bundleId: "pavel-yarovoi.RickAndMorty",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(with: [
-                "UIUserInterfaceStyle": "Light",
+                "CFBundleDisplayName": "Rick and Morty",
+                "UIApplicationSceneManifest": [
+                    "UIApplicationSupportsMultipleScenes": false,
+                    "UISceneConfigurations": [
+                        "UIWindowSceneSessionRoleApplication": [
+                            [
+                                "UISceneConfigurationName": "Default Configuration",
+                                "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
+                            ]
+                        ]
+                    ]
+                ],
                 "UILaunchStoryboardName": "LaunchScreen.storyboard",
                 "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
-                "CFBundleDisplayName": "Rick and Morty"
+                "UIUserInterfaceStyle": "Light"
             ]),
             sources: ["Application/Sources/**"],
             resources: ["Application/Resources/**"],

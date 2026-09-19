@@ -1,6 +1,4 @@
 import UIKit
-import UIComponents
-import Navigation
 import DependencyInjection
 
 // MARK: - Application delegate
@@ -9,10 +7,7 @@ import DependencyInjection
     
     // MARK: Properties
     
-    private var appDIContainer: DIContainer!
-    private var appCoordinator: Coordinator!
-    
-    var window: UIWindow?
+    private(set) var appDIContainer: DIContainer?
 }
 
 // MARK: - UI application delegate protocol implementation
@@ -24,8 +19,6 @@ extension AppDelegate: UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         setupDIcontainer()
-        setupAppCoordinator()
-        setupRootViewControler()
         
         return true
     }
@@ -37,24 +30,10 @@ private extension AppDelegate {
     
     /// Выполняет настройку контейнера с зависимостями приложения.
     func setupDIcontainer() {
-        appDIContainer = DIContainer()
+        let diContainer = DIContainer()
+        appDIContainer = diContainer
         
         let appDIAssembly = AppDIAssembly()
-        appDIAssembly.assemble(in: appDIContainer)
-    }
-    
-    /// Выполняет настройку координатора приложения.
-    func setupAppCoordinator() {
-        let navController = BaseNavigationController()
-        appCoordinator = appDIContainer.resolve(AppCoordinator.self, args: navController)
-    }
-    
-    /// Выполняет настройку главного контроллера приложения.
-    func setupRootViewControler() {
-        appCoordinator?.start()
-        
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = appCoordinator.navController
-        window?.makeKeyAndVisible()
+        appDIAssembly.assemble(in: diContainer)
     }
 }
